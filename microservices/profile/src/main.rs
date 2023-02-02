@@ -77,7 +77,7 @@ async fn main( ) -> Result<( ), Box<dyn std::error::Error>> {
     //* starting the gRPC server
 
     let implementedProfileService= ImplementedProfileService::default( );
-    let socketAddress= "0.0.0.0:4003".parse( ).unwrap( );
+    let socketAddress= "0.0.0.0:4000".parse( ).unwrap( );
 
     println!("🔥 starting gRPC server");
 
