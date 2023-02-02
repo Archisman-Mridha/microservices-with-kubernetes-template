@@ -1,0 +1,15 @@
+syntax= "proto3";
+
+package profile;
+
+message CreateProfileRequest {
+
+    string name= 1;
+    string email= 2;
+}
+
+message CreateProfileResponse {
+    oneof optional_error {
+        string error= 1;
+    }
+}

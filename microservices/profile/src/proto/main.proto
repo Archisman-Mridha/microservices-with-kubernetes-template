@@ -1,0 +1,10 @@
+syntax= "proto3";
+
+package profile;
+
+import "delete-profile.proto";
+
+service Profile {
+
+    rpc DeleteProfile(DeleteProfileRequest) returns(DeleteProfileResponse) { }
+}

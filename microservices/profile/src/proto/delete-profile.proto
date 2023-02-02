@@ -1,0 +1,13 @@
+syntax= "proto3";
+
+package profile;
+
+message DeleteProfileRequest {
+    string email= 1;
+}
+
+message DeleteProfileResponse {
+    oneof optional_error {
+        string error= 1;
+    }
+}
