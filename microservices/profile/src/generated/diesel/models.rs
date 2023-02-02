@@ -3,13 +3,13 @@
 #![allow(unused)]
 #![allow(clippy::all)]
 
-use diesel::Queryable;
+use diesel::Insertable;
+use crate::generated::diesel::schema::profiles;
 
-
-#[derive(Queryable, Debug)]
+#[derive(Insertable)]
+#[diesel(table_name= profiles)]
 pub struct Profile {
-    pub id: i64,
+    pub id: Option<i64>,
     pub name: String,
     pub email: String,
 }
-

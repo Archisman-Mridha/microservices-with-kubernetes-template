@@ -2,10 +2,10 @@
 
 mod generated;
 
-use std::thread;
+use std::{thread, cell::RefCell};
 use protobuf::Message;
 use tonic::{transport::Server, Request, Response, Status};
-use diesel::{pg::PgConnection};
+use diesel::{pg::PgConnection, prelude::*};
 use amiquip::{QueueDeclareOptions, ConsumerOptions, ConsumerMessage, Result};
 use generated::{
     proto::{
@@ -15,7 +15,7 @@ use generated::{
             profile_server::{ProfileServer, Profile}
         }
     },
-    diesel::{schema::profiles, models}
+    diesel::{schema::profiles as ProfileSchema, models::Profile as ProfileModel}
 };
 
 struct Database {
@@ -24,9 +24,7 @@ struct Database {
 
 impl Database {
     fn createConnection( ) -> Self {
-        use diesel::Connection;
-
-        let databaseUri= "postgresql://root@localhost:26257/defaultdb?sslmode=disable";
+        let databaseUri= "postgresql://root@localhost:26257/profile?sslmode=disable";
 
         let connection= PgConnection::establish(databaseUri)
             .expect("💀 error connecting to cockroachDB");
@@ -36,9 +34,25 @@ impl Database {
         return Database { connection };
     }
 
-    fn createProfile(&self, profile: &models::Profile) { }
+    fn createProfile(&mut self, profile: &ProfileModel) -> Result<usize, diesel::result::Error> {
+        return diesel::insert_into(ProfileSchema::table)
+            .values(profile)
+            .execute(&mut self.connection);
+    }
 
-    fn deleteProfile(&self, email: &str) { }
+    fn deleteProfile(&mut self, email: &str) -> Result<usize, diesel::result::Error> {
+        return diesel::delete(
+            ProfileSchema::table.filter(
+                Box::new(ProfileSchema::email.eq(email))
+            )
+        )
+            .execute(&mut self.connection);
+    }
+}
+
+thread_local! {
+    //* connecting to cockroachDB
+    static DATABASE: RefCell<Database>= RefCell::new(Database::createConnection( ));
 }
 
 fn consumeFromRabbitMQ( ) -> Result<( )> {
@@ -54,20 +68,47 @@ fn consumeFromRabbitMQ( ) -> Result<( )> {
         move | | -> amiquip::Result<( )> {
             let queue= channel.queue_declare("profile", QueueDeclareOptions::default( ))?;
 
-            let consumer= queue.consume(ConsumerOptions::default( ))?;
+            let consumer= queue.consume(
+                ConsumerOptions {
+                    no_ack: true,
+
+                    ..ConsumerOptions::default( )
+                }
+            )?;
 
             for message in consumer.receiver( ).iter( ) {
                 match message {
 
                     ConsumerMessage::Delivery(message) => {
-                        let messageBody= message.body;
+                        let messageBody= message.clone( ).body;
 
                         let mut createProfileRequest= CreateProfileRequest::new( );
 
                         if createProfileRequest.merge_from_bytes(&messageBody).is_ok( ) {
 
-                            println!("received message from rabbitMQ !");
-                            todo!( )
+                            let result= DATABASE.with(
+                                move |refCell| {
+                                    let mut database= refCell.borrow_mut( );
+                    
+                                    return database.createProfile(
+                                        &ProfileModel {
+                                            id: None,
+                                            name: createProfileRequest.name,
+                                            email: createProfileRequest.email
+                                        }
+                                    );
+                                }
+                            );
+
+                            let _= match result {
+                                Ok(_) => message.ack(&channel),
+
+                                Err(error) => {
+                                    println!("💀 error creating profile : {}", error);
+
+                                    Ok(( ))
+                                }
+                            };
 
                         } else {
                             println!("unknown type of message received from rabbitMQ");
@@ -90,9 +131,27 @@ struct ImplementedProfileService { }
 
 #[tonic::async_trait]
 impl Profile for ImplementedProfileService {
-    async fn delete_profile(&self, request: Request<DeleteProfileRequest>) -> Result<Response<DeleteProfileResponse>, Status> {
 
-        todo!( )
+    async fn delete_profile(&self, request: Request<DeleteProfileRequest>) -> Result<Response<DeleteProfileResponse>, Status> {
+        let email= String::from(request.into_inner( ).email);
+
+        let result= DATABASE.with(
+            move |refCell| {
+                let mut database= refCell.borrow_mut( );
+
+                return database.deleteProfile(&email);
+            }
+        );
+
+        match result {
+            Ok(_) => { },
+
+            Err(error) => println!("💀 error deleting profile from database : {}", error)
+        }
+
+        return Ok(Response::new(
+            DeleteProfileResponse { optional_error: None }
+        ));
     }
 }
 
@@ -103,18 +162,25 @@ async fn main( ) -> Result<( ), Box<dyn std::error::Error>> {
     consumeFromRabbitMQ( )
         .expect("💀 error connecting to rabbitMQ");
 
-    //* connect to cockroachDB
-    let database= Database::createConnection( );
+    //* creating gRPC reflection service
+
+    let reflectionService= tonic_reflection::server::Builder::configure( )
+        .register_encoded_file_descriptor_set(
+            tonic::include_file_descriptor_set!("profile_descriptor")
+        )
+        .build( )
+        .unwrap( );
 
     //* starting the gRPC server
 
     let implementedProfileService= ImplementedProfileService::default( );
-    let socketAddress= "0.0.0.0:4000".parse( ).unwrap( );
 
+    let socketAddress= "0.0.0.0:4000".parse( ).unwrap( );
     println!("🔥 starting gRPC server");
 
     Server::builder( )
         .add_service(ProfileServer::new(implementedProfileService))
+        .add_service(reflectionService)
         .serve(socketAddress)
         .await?;
 
