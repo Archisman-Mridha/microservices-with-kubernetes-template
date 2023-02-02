@@ -1,14 +1,48 @@
 #![allow(non_snake_case)]
 
+mod generated;
+
 use std::thread;
 use protobuf::Message;
 use tonic::{transport::Server, Request, Response, Status};
+use diesel::{pg::PgConnection};
+use amiquip::{QueueDeclareOptions, ConsumerOptions, ConsumerMessage, Result};
+use generated::{
+    proto::{
+        create_profile::CreateProfileRequest,
+        profile::{
+            DeleteProfileRequest, DeleteProfileResponse,
+            profile_server::{ProfileServer, Profile}
+        }
+    },
+    diesel::{schema::profiles, models}
+};
 
-mod generated;
-use generated::proto::{create_profile::CreateProfileRequest, profile::{profile_server::{ProfileServer, Profile}, DeleteProfileRequest, DeleteProfileResponse}};
+struct Database {
+    connection: PgConnection
+}
 
-fn consumeFromRabbitMQ( ) -> amiquip::Result<( )> {
-    use amiquip::{Connection, QueueDeclareOptions, ConsumerOptions, ConsumerMessage};
+impl Database {
+    fn createConnection( ) -> Self {
+        use diesel::Connection;
+
+        let databaseUri= "postgresql://root@localhost:26257/defaultdb?sslmode=disable";
+
+        let connection= PgConnection::establish(databaseUri)
+            .expect("💀 error connecting to cockroachDB");
+
+        println!("🔥 connected to cockroachDB");
+
+        return Database { connection };
+    }
+
+    fn createProfile(&self, profile: &models::Profile) { }
+
+    fn deleteProfile(&self, email: &str) { }
+}
+
+fn consumeFromRabbitMQ( ) -> Result<( )> {
+    use amiquip::Connection;
 
     let mut connection= Connection::insecure_open(
         "amqp://user:password@localhost:5672")?;
@@ -66,13 +100,11 @@ impl Profile for ImplementedProfileService {
 async fn main( ) -> Result<( ), Box<dyn std::error::Error>> {
 
     //* connect to rabbitMQ and start consuming messages in a separate thread
-    consumeFromRabbitMQ( ).unwrap_or_else(
-        |error| {
-            println!("{}", error);
+    consumeFromRabbitMQ( )
+        .expect("💀 error connecting to rabbitMQ");
 
-            panic!("💀 error connecting to rabbitMQ");
-        }
-    );
+    //* connect to cockroachDB
+    let database= Database::createConnection( );
 
     //* starting the gRPC server
 

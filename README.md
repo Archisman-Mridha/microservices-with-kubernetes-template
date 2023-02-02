@@ -27,7 +27,9 @@ A template distributed microservices system backed by Kubernetes and AWS.
 - *`diesel cli`* -
     ```bash
     sudo apt install libpq-dev -y
-    cargo install diesel_cli --no-default-features --features postgres
+
+    cargo install diesel_cli --no-default-features --features postgres && \
+        cargo install diesel_cli_ext
     ```
 
 ## Conventions
