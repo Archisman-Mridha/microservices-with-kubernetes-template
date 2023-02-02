@@ -16,6 +16,14 @@ A template distributed microservices system backed by Kubernetes and AWS.
     sudo apt install -y protobuf-compiler libprotobuf-dev
     ```
 
+- *`migrate`* -
+    ```bash
+    curl -s https://packagecloud.io/install/repositories/golang-migrate/migrate/script.deb.sh | sudo bash
+    sudo apt-get update
+
+    sudo apt-get install migrate
+    ```
+
 ## Conventions
 
 - In RabbitMQ, if name of a queue is **profile**, that means, the messages in the queue will be consumed by the profile microservice.

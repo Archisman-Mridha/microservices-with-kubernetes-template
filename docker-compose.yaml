@@ -11,3 +11,12 @@ services:
         environment:
             RABBITMQ_DEFAULT_USER: user
             RABBITMQ_DEFAULT_PASS: password
+
+
+    cockroachdb:
+        container_name: cockroachdb
+        image: cockroachdb/cockroach:latest
+        ports:
+            - 26257:26257
+            - 8080:8080
+        command: start-single-node --insecure
