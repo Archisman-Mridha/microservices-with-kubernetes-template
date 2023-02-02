@@ -1,0 +1,16 @@
+syntax= "proto3";
+
+package authentication;
+option go_package="generated/proto";
+
+import "start-registration.proto";
+import "register.proto";
+import "signin.proto";
+
+service Authentication {
+
+    rpc StartRegistration(StartRegistrationRequest) returns(StartRegistrationResponse) { }
+    rpc Register(RegisterReqeust) returns(RegisterResponse) { }
+
+    rpc Signin(SigninReqeust) returns(SigninResponse) { }
+}

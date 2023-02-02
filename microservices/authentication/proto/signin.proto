@@ -1,0 +1,14 @@
+syntax= "proto3";
+
+package authentication;
+option go_package="generated/proto";
+
+message SigninReqeust {
+
+    string email= 1;
+    string password= 2;
+}
+
+message SigninResponse {
+    optional string error= 1;
+}

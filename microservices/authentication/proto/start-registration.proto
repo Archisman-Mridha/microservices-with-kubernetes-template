@@ -1,0 +1,14 @@
+syntax= "proto3";
+
+package authentication;
+option go_package="generated/proto";
+
+message StartRegistrationRequest {
+
+    string name= 1;
+    string email= 2;
+}
+
+message StartRegistrationResponse {
+    optional string error= 1;
+}

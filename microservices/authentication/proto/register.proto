@@ -1,0 +1,12 @@
+syntax= "proto3";
+
+package authentication;
+option go_package="generated/proto";
+
+message RegisterReqeust {
+    string password= 1;
+}
+
+message RegisterResponse {
+    optional string error= 1;
+}
