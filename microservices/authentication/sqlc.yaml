@@ -1,0 +1,11 @@
+version: "2"
+
+sql:
+    - engine: postgresql
+      queries: ./sql/queries.sql
+      schema: ./sql/schema.sql
+      gen:
+        go:
+            package: sqlc
+            out: ./generated/sqlc
+            emit_interface: true

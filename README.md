@@ -14,6 +14,13 @@ A template distributed microservices system backed by Kubernetes and AWS.
 - *`protoc`* -
     ```bash
     sudo apt install -y protobuf-compiler libprotobuf-dev
+
+    # installing goLang plugin
+    go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+
+    set -U fish_user_paths $HOME/go/bin $fish_user_paths
+    set -U fish_user_paths /usr/local/go/bin $fish_user_paths
     ```
 
 - *`migrate`* -
@@ -30,6 +37,14 @@ A template distributed microservices system backed by Kubernetes and AWS.
 
     cargo install diesel_cli --no-default-features --features postgres && \
         cargo install diesel_cli_ext
+    ```
+
+- *`sqlc`* -
+    ```bash
+    # gcc is required to use sqlc
+    sudo apt install gcc -y
+
+    go install github.com/kyleconroy/sqlc/cmd/sqlc@latest
     ```
 
 ## Conventions
