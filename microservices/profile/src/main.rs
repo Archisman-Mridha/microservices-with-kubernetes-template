@@ -1,11 +1,11 @@
 #![allow(non_snake_case)]
 
-mod generated;
 use std::thread;
-
-use generated::proto::{create_profile::CreateProfileRequest, profile::{profile_server::{ProfileServer, Profile}, DeleteProfileRequest, DeleteProfileResponse}};
 use protobuf::Message;
 use tonic::{transport::Server, Request, Response, Status};
+
+mod generated;
+use generated::proto::{create_profile::CreateProfileRequest, profile::{profile_server::{ProfileServer, Profile}, DeleteProfileRequest, DeleteProfileResponse}};
 
 fn consumeFromRabbitMQ( ) -> amiquip::Result<( )> {
     use amiquip::{Connection, QueueDeclareOptions, ConsumerOptions, ConsumerMessage};

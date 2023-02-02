@@ -24,6 +24,12 @@ A template distributed microservices system backed by Kubernetes and AWS.
     sudo apt-get install migrate
     ```
 
+- *`diesel cli`* -
+    ```bash
+    sudo apt install libpq-dev -y
+    cargo install diesel_cli --no-default-features --features postgres
+    ```
+
 ## Conventions
 
 - In RabbitMQ, if name of a queue is **profile**, that means, the messages in the queue will be consumed by the profile microservice.
