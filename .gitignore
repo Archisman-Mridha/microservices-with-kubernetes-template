@@ -1,2 +1,4 @@
 target
 !/microservices/otp/target/generated-sources
+
+bin
