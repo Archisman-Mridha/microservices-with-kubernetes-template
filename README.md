@@ -47,6 +47,32 @@ A template distributed microservices system backed by Kubernetes and AWS.
     go install github.com/kyleconroy/sqlc/cmd/sqlc@latest
     ```
 
+- *`java`* -
+    ```bash
+    wget https://download.oracle.com/java/19/latest/jdk-19_linux-x64_bin.deb
+    sudo dpkg -i jdk-19_linux-x64_bin.deb
+    rm jdk-19_linux-x64_bin.deb
+
+    sudo update-alternatives --install /usr/bin/java java /usr/lib/jvm/jdk-19/bin/java 1
+    java -version
+
+    sudo update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/jdk-19/bin/javac 1
+    javac -version
+
+    sudo update-alternatives --config java
+
+    set -Ua JAVA_HOME /usr/lib/jvm/jdk-19/bin/java
+
+    # maven for dependency management
+    sudo apt-get install -y maven
+    ```
+
+- *`javafmt`* -
+    ```bash
+    wget https://github.com/google/google-java-format/releases/download/v1.15.0/google-java-format-1.15.0-all-deps.jar
+    mv google-java-format-1.15.0-all-deps.jar javafmt.jar
+    ```
+
 ## Conventions
 
 - In RabbitMQ, if name of a queue is **profile**, that means, the messages in the queue will be consumed by the profile microservice.

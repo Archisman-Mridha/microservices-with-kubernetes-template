@@ -1,0 +1,16 @@
+syntax= "proto3";
+
+package otp;
+option java_package= "com.otp.generated.proto";
+
+message VerifyOTPRequest {
+
+    string email= 1;
+    string otp= 2;
+}
+
+message VerifyOTPResponse {
+    oneof optional_error {
+        string error= 1;
+    }
+}
