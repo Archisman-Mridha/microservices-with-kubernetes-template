@@ -4,58 +4,59 @@
 package com.otp.generated.proto;
 
 public final class VerifyOtp {
-  private VerifyOtp() {}
-  public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistryLite registry) {
-  }
+    private VerifyOtp() {}
 
-  public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistry registry) {
-    registerAllExtensions(
-        (com.google.protobuf.ExtensionRegistryLite) registry);
-  }
-  static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_otp_VerifyOtpRequest_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_otp_VerifyOtpRequest_fieldAccessorTable;
-  static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_otp_VerifyOtpResponse_descriptor;
-  static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_otp_VerifyOtpResponse_fieldAccessorTable;
+    public static void registerAllExtensions(com.google.protobuf.ExtensionRegistryLite registry) {}
 
-  public static com.google.protobuf.Descriptors.FileDescriptor
-      getDescriptor() {
-    return descriptor;
-  }
-  private static  com.google.protobuf.Descriptors.FileDescriptor
-      descriptor;
-  static {
-    java.lang.String[] descriptorData = {
-      "\n\020verify-otp.proto\022\003otp\".\n\020VerifyOtpRequ" +
-      "est\022\r\n\005email\030\001 \001(\t\022\013\n\003otp\030\002 \001(\t\"6\n\021Verif" +
-      "yOtpResponse\022\017\n\005error\030\001 \001(\tH\000B\020\n\016optiona" +
-      "l_errorB\033\n\027com.otp.generated.protoP\001b\006pr" +
-      "oto3"
-    };
-    descriptor = com.google.protobuf.Descriptors.FileDescriptor
-      .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
-        });
-    internal_static_otp_VerifyOtpRequest_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_otp_VerifyOtpRequest_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_otp_VerifyOtpRequest_descriptor,
-        new java.lang.String[] { "Email", "Otp", });
-    internal_static_otp_VerifyOtpResponse_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_otp_VerifyOtpResponse_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_otp_VerifyOtpResponse_descriptor,
-        new java.lang.String[] { "Error", "OptionalError", });
-  }
+    public static void registerAllExtensions(com.google.protobuf.ExtensionRegistry registry) {
+        registerAllExtensions((com.google.protobuf.ExtensionRegistryLite) registry);
+    }
 
-  // @@protoc_insertion_point(outer_class_scope)
+    static final com.google.protobuf.Descriptors.Descriptor
+            internal_static_otp_VerifyOtpRequest_descriptor;
+    static final com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+            internal_static_otp_VerifyOtpRequest_fieldAccessorTable;
+    static final com.google.protobuf.Descriptors.Descriptor
+            internal_static_otp_VerifyOtpResponse_descriptor;
+    static final com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+            internal_static_otp_VerifyOtpResponse_fieldAccessorTable;
+
+    public static com.google.protobuf.Descriptors.FileDescriptor getDescriptor() {
+        return descriptor;
+    }
+
+    private static com.google.protobuf.Descriptors.FileDescriptor descriptor;
+
+    static {
+        java.lang.String[] descriptorData = {
+            "\n"
+                + "\020verify-otp.proto\022\003otp\".\n"
+                + "\020VerifyOtpRequest\022\r\n"
+                + "\005email\030\001 \001(\t\022\013\n"
+                + "\003otp\030\002 \001(\t\"6\n"
+                + "\021VerifyOtpResponse\022\017\n"
+                + "\005error\030\001 \001(\tH\000B\020\n"
+                + "\016optional_errorB\033\n"
+                + "\027com.otp.generated.protoP\001b\006proto3"
+        };
+        descriptor =
+                com.google.protobuf.Descriptors.FileDescriptor.internalBuildGeneratedFileFrom(
+                        descriptorData, new com.google.protobuf.Descriptors.FileDescriptor[] {});
+        internal_static_otp_VerifyOtpRequest_descriptor = getDescriptor().getMessageTypes().get(0);
+        internal_static_otp_VerifyOtpRequest_fieldAccessorTable =
+                new com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+                        internal_static_otp_VerifyOtpRequest_descriptor,
+                        new java.lang.String[] {
+                            "Email", "Otp",
+                        });
+        internal_static_otp_VerifyOtpResponse_descriptor = getDescriptor().getMessageTypes().get(1);
+        internal_static_otp_VerifyOtpResponse_fieldAccessorTable =
+                new com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+                        internal_static_otp_VerifyOtpResponse_descriptor,
+                        new java.lang.String[] {
+                            "Error", "OptionalError",
+                        });
+    }
+
+    // @@protoc_insertion_point(outer_class_scope)
 }
