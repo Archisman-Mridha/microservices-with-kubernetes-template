@@ -20,3 +20,15 @@ services:
             - 26257:26257
             - 8080:8080
         command: start-single-node --insecure
+
+    redis:
+        container_name: redis
+        image: redis:7-alpine
+        ports:
+            - 6379:6379
+        command: redis-server --requirepass password --databases 1
+        environment:
+            REDIS_REPLICATION_MODE: master
+            REDIS_PORT: 6379
+            WAIT_HOSTS: redis:6379
+            REDIS_PASSWORD: password

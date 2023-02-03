@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 	"net"
 
+	"github.com/go-redis/redis"
 	"github.com/streadway/amqp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -16,10 +18,6 @@ const (
 	OTPQueueName= "otp"
 	ProfileQueueName= "profile"
 )
-
-type ImplementedAuthenticationService struct {
-	*protocGenerated.UnimplementedAuthenticationServer
-}
 
 func connectToRabbitMQ( ) func( ) {
 	connection, error := amqp.Dial("amqp://user:password@localhost:5672")
@@ -47,11 +45,39 @@ func connectToRabbitMQ( ) func( ) {
 	}
 }
 
+type ImplementedAuthenticationService struct {
+	*protocGenerated.UnimplementedAuthenticationServer
+}
+
+func(*ImplementedAuthenticationService) StartRegistration(
+	ctx context.Context, request *protocGenerated.StartRegistrationRequest) (*protocGenerated.StartRegistrationResponse, error) {
+
+	return &protocGenerated.StartRegistrationResponse{ }, nil
+}
+
 func main( ) {
 
 	//* connecting to rabbitMQ
 	cleanupRabbitMQResources := connectToRabbitMQ( )
 	defer cleanupRabbitMQResources( )
+
+	//* connecting to redis
+
+	redisClient := redis.NewClient(
+		&redis.Options{
+			Addr: "localhost:6379",
+
+			Password: "password",
+			DB: 0,
+		},
+	)
+
+	_, error := redisClient.Ping( ).Result( )
+	if error != nil {
+		log.Fatal("💀 error connecting to redis : ", error.Error( )) }
+	defer redisClient.Close( )
+
+	log.Println("🔥 connected to redis")
 
 	//* starting the gRPC server
 
