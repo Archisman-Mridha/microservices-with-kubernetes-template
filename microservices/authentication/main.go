@@ -30,6 +30,8 @@ var (
 
 	EmailValidationError= "error validating email"
 	NameValidationError= "name should be between 3 to 50 characters"
+	UserNotFoundError= "email not registered"
+	WrongPasswordError= "wrong password provided"
 
 	SendOTP_RabbitMQMessageType= "SendOTP"
 
@@ -285,6 +287,30 @@ func(*ImplementedAuthenticationService) Register(
 	}
 
 	return &protocGenerated.RegisterResponse{Jwt: jwt}, nil
+}
+
+func(*ImplementedAuthenticationService) Signin(
+	ctx context.Context, request *protocGenerated.SigninReqeust) (*protocGenerated.SigninResponse, error) {
+
+	//! search user from authentication database
+
+	password, error := globalVariables.Repository.GetPasswordForEmail(context.Background( ), request.Email)
+
+	if error == sql.ErrNoRows {
+		return &protocGenerated.SigninResponse{Error: &UserNotFoundError}, nil
+	} else if error != nil {
+		return &protocGenerated.SigninResponse{Error: &ServerError}, nil
+	}
+
+	if password != request.Password {
+		return &protocGenerated.SigninResponse{Error: &WrongPasswordError}, nil }
+
+	//! creating JWT
+	jwt, createJWTError := CreateJwt(request.Email)
+	if error != nil {
+		return &protocGenerated.SigninResponse{Error: createJWTError}, nil }
+
+	return &protocGenerated.SigninResponse{Jwt: jwt}, nil
 }
 
 func main( ) {

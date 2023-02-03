@@ -37,3 +37,16 @@ func (q *Queries) FindRegisteredEmail(ctx context.Context, email string) (User, 
 	err := row.Scan(&i.ID, &i.Email, &i.Password)
 	return i, err
 }
+
+const getPasswordForEmail = `-- name: GetPasswordForEmail :one
+SELECT password FROM users
+    WHERE users.email= $1
+        LIMIT 1
+`
+
+func (q *Queries) GetPasswordForEmail(ctx context.Context, email string) (string, error) {
+	row := q.db.QueryRowContext(ctx, getPasswordForEmail, email)
+	var password string
+	err := row.Scan(&password)
+	return password, err
+}
