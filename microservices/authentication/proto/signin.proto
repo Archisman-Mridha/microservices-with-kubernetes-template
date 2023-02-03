@@ -11,4 +11,6 @@ message SigninReqeust {
 
 message SigninResponse {
     optional string error= 1;
+
+    string jwt= 2;
 }

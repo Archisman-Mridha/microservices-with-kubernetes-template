@@ -4,9 +4,13 @@ package authentication;
 option go_package="generated/proto";
 
 message RegisterReqeust {
-    string password= 1;
+
+    string email= 1;
+    string password= 2;
 }
 
 message RegisterResponse {
     optional string error= 1;
+
+    string jwt= 2;
 }

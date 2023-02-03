@@ -1,0 +1,11 @@
+syntax= "proto3";
+
+package authentication;
+option go_package="generated/proto";
+
+message CreateProfileRequest {
+    string messageType= 1;
+
+    string name= 2;
+    string email= 3;
+}

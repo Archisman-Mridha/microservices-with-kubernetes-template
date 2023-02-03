@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/lib/pq v1.10.7
 	github.com/streadway/amqp v1.0.0
 	google.golang.org/grpc v1.52.3

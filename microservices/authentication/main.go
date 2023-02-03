@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis"
+	"github.com/golang-jwt/jwt/v4"
 	_ "github.com/lib/pq"
 	"github.com/streadway/amqp"
 	"google.golang.org/grpc"
@@ -31,6 +32,8 @@ var (
 	NameValidationError= "name should be between 3 to 50 characters"
 
 	SendOTP_RabbitMQMessageType= "SendOTP"
+
+	jwtSigningSecert= "secret"
 )
 
 type GlobalVariables struct {
@@ -80,6 +83,64 @@ func connectToCockroachDB( ) {
 	globalVariables.Repository= sqlcGenerated.New(connection)
 
 	log.Println("🔥 connected to cockroachDB")
+}
+
+type JwtPayload struct {
+	jwt.RegisteredClaims
+
+	Email string `json:"email"`
+}
+
+func CreateJwt(email string) (string, *string) {
+
+	jwtPayload := JwtPayload{
+		Email: email,
+
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now( ).Add(time.Hour * 24)),
+		},
+	}
+
+	token, error := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwtPayload).
+		SignedString([]byte(jwtSigningSecert))
+
+	if error != nil {
+		log.Println("error : ", error.Error( ))
+
+		return token, &ServerError
+	}
+
+	return token, nil
+}
+
+func VerifyJwt(token string) (bool, *string) {
+
+	var (
+		jwtPayload JwtPayload
+		verifyJwtError string
+	)
+
+	_, error := jwt.ParseWithClaims(
+		token, &jwtPayload,
+			func(t *jwt.Token) (interface{ }, error) {
+				return []byte(jwtSigningSecert), nil
+			},
+	)
+
+	if error != nil {
+
+		if error == jwt.ErrSignatureInvalid {
+			verifyJwtError= "jwt expired or not found"
+		} else {
+			log.Println("error : ", error.Error( ))
+
+			verifyJwtError= ServerError
+		}
+
+		return false, &verifyJwtError
+	}
+
+	return true, nil
 }
 
 type ImplementedAuthenticationService struct {
@@ -152,6 +213,78 @@ func(*ImplementedAuthenticationService) StartRegistration(
 	}
 
 	return &protocGenerated.StartRegistrationResponse{ }, nil
+}
+
+func(*ImplementedAuthenticationService) Register(
+	ctx context.Context, request *protocGenerated.RegisterReqeust) (*protocGenerated.RegisterResponse, error) {
+
+	//! fetching temporary user details from redis
+
+	record, error := globalVariables.RedisClient.Get(request.Email).Result( )
+	if error != nil {
+		log.Println("error : ", error.Error( ))
+		return &protocGenerated.RegisterResponse{Error: &ServerError}, nil
+	}
+
+	var temporaryUserDetails TemporaryUserDetails
+
+	error= json.Unmarshal([ ]byte(record), &temporaryUserDetails)
+	if error != nil {
+		log.Println("error : ", error.Error( ))
+		return &protocGenerated.RegisterResponse{Error: &ServerError}, nil
+	}
+
+	//! saving the user details permanently in cockroachDB
+	error= globalVariables.Repository.CreateUser(
+		context.Background( ), sqlcGenerated.CreateUserParams{
+
+			Email: temporaryUserDetails.Email,
+			Password: request.Password,
+		},
+	)
+	if error != nil {
+		log.Println("error : ", error.Error( ))
+		return &protocGenerated.RegisterResponse{Error: &ServerError}, nil
+	}
+
+	//! creating JWT
+	jwt, createJWTError := CreateJwt(temporaryUserDetails.Email)
+	if error != nil {
+		return &protocGenerated.RegisterResponse{Error: createJWTError}, nil }
+
+	//! sending request to profile service to create new profile
+
+	message, error := proto.Marshal(
+		&protocGenerated.CreateProfileRequest{
+			MessageType: SendOTP_RabbitMQMessageType,
+
+			Name: temporaryUserDetails.Name,
+			Email: request.Email,
+		},
+	)
+	if error != nil {
+		log.Println("error : ", error.Error( ))
+		return &protocGenerated.RegisterResponse{Error: &ServerError}, nil
+	}
+
+	error= globalVariables.RabbitMQChannel.Publish(
+		"", ProfileQueueName,
+		false, false,
+		amqp.Publishing{ Body: message },
+	)
+	if error != nil {
+		log.Println("error : ", error.Error( ))
+		return &protocGenerated.RegisterResponse{Error: &ServerError}, nil
+	}
+
+	//! evicting the record from redis
+	error= globalVariables.RedisClient.Del(temporaryUserDetails.Email).Err( )
+	if error != nil {
+		log.Println("error : ", error.Error( ))
+		return &protocGenerated.RegisterResponse{Error: &ServerError}, nil
+	}
+
+	return &protocGenerated.RegisterResponse{Jwt: jwt}, nil
 }
 
 func main( ) {

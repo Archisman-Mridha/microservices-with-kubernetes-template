@@ -21,6 +21,7 @@ services:
             - 8080:8080
         command: start-single-node --insecure
 
+    # database 1 is used by authentication microservice
     redis:
         container_name: redis
         image: redis:7-alpine
