@@ -63,8 +63,11 @@ A template distributed microservices system backed by Kubernetes and AWS.
 
     set -Ua JAVA_HOME /usr/lib/jvm/jdk-19/bin/java
 
-    # for dependency management
-    sudo apt-get install -y gradle
+    # installing gradle for dependency management
+    wget https://services.gradle.org/distributions/gradle-7.6-bin.zip
+    sudo unzip -d /opt/gradle gradle-7.6-bin.zip
+
+    rm gradle-7.6-bin.zip
     ```
 
 - *`javafmt`* -

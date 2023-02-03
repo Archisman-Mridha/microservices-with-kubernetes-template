@@ -15,29 +15,29 @@ public final class OtpGrpc {
   public static final String SERVICE_NAME = "otp.Otp";
 
   // Static method descriptors that strictly reflect the proto.
-  private static volatile io.grpc.MethodDescriptor<com.otp.generated.proto.VerifyOtp.VerifyOtpRequest,
-      com.otp.generated.proto.VerifyOtp.VerifyOtpResponse> getVerifyOtpMethod;
+  private static volatile io.grpc.MethodDescriptor<com.otp.generated.proto.VerifyOtpRequest,
+      com.otp.generated.proto.VerifyOtpResponse> getVerifyOtpMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "VerifyOtp",
-      requestType = com.otp.generated.proto.VerifyOtp.VerifyOtpRequest.class,
-      responseType = com.otp.generated.proto.VerifyOtp.VerifyOtpResponse.class,
+      requestType = com.otp.generated.proto.VerifyOtpRequest.class,
+      responseType = com.otp.generated.proto.VerifyOtpResponse.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
-  public static io.grpc.MethodDescriptor<com.otp.generated.proto.VerifyOtp.VerifyOtpRequest,
-      com.otp.generated.proto.VerifyOtp.VerifyOtpResponse> getVerifyOtpMethod() {
-    io.grpc.MethodDescriptor<com.otp.generated.proto.VerifyOtp.VerifyOtpRequest, com.otp.generated.proto.VerifyOtp.VerifyOtpResponse> getVerifyOtpMethod;
+  public static io.grpc.MethodDescriptor<com.otp.generated.proto.VerifyOtpRequest,
+      com.otp.generated.proto.VerifyOtpResponse> getVerifyOtpMethod() {
+    io.grpc.MethodDescriptor<com.otp.generated.proto.VerifyOtpRequest, com.otp.generated.proto.VerifyOtpResponse> getVerifyOtpMethod;
     if ((getVerifyOtpMethod = OtpGrpc.getVerifyOtpMethod) == null) {
       synchronized (OtpGrpc.class) {
         if ((getVerifyOtpMethod = OtpGrpc.getVerifyOtpMethod) == null) {
           OtpGrpc.getVerifyOtpMethod = getVerifyOtpMethod =
-              io.grpc.MethodDescriptor.<com.otp.generated.proto.VerifyOtp.VerifyOtpRequest, com.otp.generated.proto.VerifyOtp.VerifyOtpResponse>newBuilder()
+              io.grpc.MethodDescriptor.<com.otp.generated.proto.VerifyOtpRequest, com.otp.generated.proto.VerifyOtpResponse>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(SERVICE_NAME, "VerifyOtp"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  com.otp.generated.proto.VerifyOtp.VerifyOtpRequest.getDefaultInstance()))
+                  com.otp.generated.proto.VerifyOtpRequest.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  com.otp.generated.proto.VerifyOtp.VerifyOtpResponse.getDefaultInstance()))
+                  com.otp.generated.proto.VerifyOtpResponse.getDefaultInstance()))
               .setSchemaDescriptor(new OtpMethodDescriptorSupplier("VerifyOtp"))
               .build();
         }
@@ -96,8 +96,8 @@ public final class OtpGrpc {
 
     /**
      */
-    public void verifyOtp(com.otp.generated.proto.VerifyOtp.VerifyOtpRequest request,
-        io.grpc.stub.StreamObserver<com.otp.generated.proto.VerifyOtp.VerifyOtpResponse> responseObserver) {
+    public void verifyOtp(com.otp.generated.proto.VerifyOtpRequest request,
+        io.grpc.stub.StreamObserver<com.otp.generated.proto.VerifyOtpResponse> responseObserver) {
       io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getVerifyOtpMethod(), responseObserver);
     }
 
@@ -107,8 +107,8 @@ public final class OtpGrpc {
             getVerifyOtpMethod(),
             io.grpc.stub.ServerCalls.asyncUnaryCall(
               new MethodHandlers<
-                com.otp.generated.proto.VerifyOtp.VerifyOtpRequest,
-                com.otp.generated.proto.VerifyOtp.VerifyOtpResponse>(
+                com.otp.generated.proto.VerifyOtpRequest,
+                com.otp.generated.proto.VerifyOtpResponse>(
                   this, METHODID_VERIFY_OTP)))
           .build();
     }
@@ -130,8 +130,8 @@ public final class OtpGrpc {
 
     /**
      */
-    public void verifyOtp(com.otp.generated.proto.VerifyOtp.VerifyOtpRequest request,
-        io.grpc.stub.StreamObserver<com.otp.generated.proto.VerifyOtp.VerifyOtpResponse> responseObserver) {
+    public void verifyOtp(com.otp.generated.proto.VerifyOtpRequest request,
+        io.grpc.stub.StreamObserver<com.otp.generated.proto.VerifyOtpResponse> responseObserver) {
       io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getVerifyOtpMethod(), getCallOptions()), request, responseObserver);
     }
@@ -153,7 +153,7 @@ public final class OtpGrpc {
 
     /**
      */
-    public com.otp.generated.proto.VerifyOtp.VerifyOtpResponse verifyOtp(com.otp.generated.proto.VerifyOtp.VerifyOtpRequest request) {
+    public com.otp.generated.proto.VerifyOtpResponse verifyOtp(com.otp.generated.proto.VerifyOtpRequest request) {
       return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getVerifyOtpMethod(), getCallOptions(), request);
     }
@@ -175,8 +175,8 @@ public final class OtpGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<com.otp.generated.proto.VerifyOtp.VerifyOtpResponse> verifyOtp(
-        com.otp.generated.proto.VerifyOtp.VerifyOtpRequest request) {
+    public com.google.common.util.concurrent.ListenableFuture<com.otp.generated.proto.VerifyOtpResponse> verifyOtp(
+        com.otp.generated.proto.VerifyOtpRequest request) {
       return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getVerifyOtpMethod(), getCallOptions()), request);
     }
@@ -202,8 +202,8 @@ public final class OtpGrpc {
     public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
         case METHODID_VERIFY_OTP:
-          serviceImpl.verifyOtp((com.otp.generated.proto.VerifyOtp.VerifyOtpRequest) request,
-              (io.grpc.stub.StreamObserver<com.otp.generated.proto.VerifyOtp.VerifyOtpResponse>) responseObserver);
+          serviceImpl.verifyOtp((com.otp.generated.proto.VerifyOtpRequest) request,
+              (io.grpc.stub.StreamObserver<com.otp.generated.proto.VerifyOtpResponse>) responseObserver);
           break;
         default:
           throw new AssertionError();
