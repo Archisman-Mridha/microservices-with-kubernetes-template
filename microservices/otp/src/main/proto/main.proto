@@ -1,0 +1,10 @@
+syntax= "proto3";
+
+package otp;
+option java_package= "com.otp.generated.proto";
+
+import "verify-otp.proto";
+
+service Otp {
+    rpc VerifyOtp(VerifyOtpRequest) returns(VerifyOtpResponse) { }
+}
