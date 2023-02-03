@@ -1,3 +1,2 @@
-protoc-generate:
-	chmod +x ./scripts/protoc-generate.sh
-	./scripts/protoc-generate.sh
+serve:
+	mvn spring-boot:run
