@@ -63,8 +63,8 @@ A template distributed microservices system backed by Kubernetes and AWS.
 
     set -Ua JAVA_HOME /usr/lib/jvm/jdk-19/bin/java
 
-    # maven for dependency management
-    sudo apt-get install -y maven
+    # for dependency management
+    sudo apt-get install -y gradle
     ```
 
 - *`javafmt`* -
