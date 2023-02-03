@@ -1,0 +1,8 @@
+syntax= "proto3";
+
+package authentication;
+option go_package="generated/proto";
+
+message RabbitMQMessage {
+    string messageType= 1;
+}

@@ -25,6 +25,7 @@ import (
 var (
 	OTPQueueName= "otp"
 	ProfileQueueName= "profile"
+	AuthenticationQueueName= "authentication"
 
 	ServerError= "server error occured"
 
@@ -34,6 +35,7 @@ var (
 	WrongPasswordError= "wrong password provided"
 
 	SendOTP_RabbitMQMessageType= "SendOTP"
+	SetEmailVerified_RabbitMQMessageType= "SetEmailVerified"
 
 	jwtSigningSecert= "secret"
 )
@@ -56,13 +58,79 @@ func connectToRabbitMQ( ) (*amqp.Channel, func( )) {
 	if error != nil {
 		log.Fatal("💀 error creating rabbitMQ channel : ", error.Error( ))}
 
-	for _, queueName := range []string{OTPQueueName, ProfileQueueName} {
+	for _, queueName := range []string{OTPQueueName, ProfileQueueName, AuthenticationQueueName} {
 		_, error := channel.QueueDeclare(
 			queueName, false, false, false, false, nil)
 
 		if error != nil {
 			log.Fatalf("error declaring queue %s : %s", queueName, error.Error( ))}
 	}
+
+	go func( ) {
+		newMessages, error := channel.Consume(
+			AuthenticationQueueName, "", false, false, false, false, nil)
+		if error != nil {
+			log.Fatalf("error consuming from queue %s : %s", AuthenticationQueueName, error.Error( ))}
+
+		for message := range newMessages {
+			var unmarshalledMessage protocGenerated.RabbitMQMessage
+
+			error := proto.Unmarshal(message.Body, &unmarshalledMessage)
+			if error != nil {
+				log.Fatalf("error : %s", error.Error( ))}
+
+			switch unmarshalledMessage.MessageType {
+
+				case SetEmailVerified_RabbitMQMessageType:
+					var request protocGenerated.SetEmailVerifiedRequest
+
+					error := proto.Unmarshal(message.Body, &request)
+					if error != nil {
+						log.Fatalf("error : %s", error.Error( ))
+
+						message.Ack(false)
+						continue
+					}
+
+					//! fetch the record from redis
+					record, error := globalVariables.RedisClient.Get(request.Email).Result( )
+					if error != nil {
+						log.Fatalf("error : %s", error.Error( ))
+
+						message.Ack(false)
+						continue
+					}
+
+					//! unmarshalling and update the record
+
+					var temporaryUserDetails TemporaryUserDetails
+
+					error= json.Unmarshal([ ]byte(record), &temporaryUserDetails)
+					if error != nil {
+						log.Fatalf("error : %s", error.Error( ))
+
+						message.Ack(false)
+						continue
+					}
+
+					temporaryUserDetails.IsVerified= true
+
+					//! updating the record in redis
+					error= globalVariables.RedisClient.Set(request.Email, temporaryUserDetails, -1).Err( )
+					if error != nil {
+						log.Fatalf("error : %s", error.Error( ))
+
+						message.Ack(false)
+						continue
+					}
+
+					message.Ack(true)
+
+				default:
+					log.Printf("unknown message of type %s received", unmarshalledMessage.MessageType)
+			}
+		}
+	}( )
 
 	log.Println("🔥 connected to rabbitMQ")
 
