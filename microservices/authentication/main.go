@@ -63,21 +63,21 @@ func connectToRabbitMQ( ) (*amqp.Channel, func( )) {
 			queueName, false, false, false, false, nil)
 
 		if error != nil {
-			log.Fatalf("error declaring queue %s : %s", queueName, error.Error( ))}
+			log.Fatalf("💀 error declaring queue %s : %s", queueName, error.Error( ))}
 	}
 
 	go func( ) {
 		newMessages, error := channel.Consume(
 			AuthenticationQueueName, "", false, false, false, false, nil)
 		if error != nil {
-			log.Fatalf("error consuming from queue %s : %s", AuthenticationQueueName, error.Error( ))}
+			log.Fatalf("💀 error consuming from queue %s : %s", AuthenticationQueueName, error.Error( ))}
 
 		for message := range newMessages {
 			var unmarshalledMessage protocGenerated.RabbitMQMessage
 
 			error := proto.Unmarshal(message.Body, &unmarshalledMessage)
 			if error != nil {
-				log.Fatalf("error : %s", error.Error( ))}
+				log.Fatalf("💀 error unmarshalling new message received from queue : %s", error.Error( ))}
 
 			switch unmarshalledMessage.MessageType {
 
@@ -86,7 +86,7 @@ func connectToRabbitMQ( ) (*amqp.Channel, func( )) {
 
 					error := proto.Unmarshal(message.Body, &request)
 					if error != nil {
-						log.Fatalf("error : %s", error.Error( ))
+						log.Fatalf("💀 error unmarshalling `set email verified` request : %s", error.Error( ))
 
 						message.Ack(false)
 						continue
@@ -95,7 +95,7 @@ func connectToRabbitMQ( ) (*amqp.Channel, func( )) {
 					//! fetch the record from redis
 					record, error := globalVariables.RedisClient.Get(request.Email).Result( )
 					if error != nil {
-						log.Fatalf("error : %s", error.Error( ))
+						log.Fatalf("💀 error fetching temporary user details from redis : %s", error.Error( ))
 
 						message.Ack(false)
 						continue
@@ -107,7 +107,7 @@ func connectToRabbitMQ( ) (*amqp.Channel, func( )) {
 
 					error= json.Unmarshal([ ]byte(record), &temporaryUserDetails)
 					if error != nil {
-						log.Fatalf("error : %s", error.Error( ))
+						log.Fatalf("💀 error unmarshalling temporary user details redis record : %s", error.Error( ))
 
 						message.Ack(false)
 						continue
@@ -118,7 +118,7 @@ func connectToRabbitMQ( ) (*amqp.Channel, func( )) {
 					//! updating the record in redis
 					error= globalVariables.RedisClient.Set(request.Email, temporaryUserDetails, -1).Err( )
 					if error != nil {
-						log.Fatalf("error : %s", error.Error( ))
+						log.Fatalf("💀 error updating temporary user details record in redis : %s", error.Error( ))
 
 						message.Ack(false)
 						continue
@@ -175,7 +175,7 @@ func CreateJwt(email string) (string, *string) {
 		SignedString([]byte(jwtSigningSecert))
 
 	if error != nil {
-		log.Println("error : ", error.Error( ))
+		log.Println("💀 error signin JWT : ", error.Error( ))
 
 		return token, &ServerError
 	}
@@ -202,7 +202,7 @@ func VerifyJwt(token string) (bool, *string) {
 		if error == jwt.ErrSignatureInvalid {
 			verifyJwtError= "jwt expired or not found"
 		} else {
-			log.Println("error : ", error.Error( ))
+			log.Println("💀 error verifying JWT : ", error.Error( ))
 
 			verifyJwtError= ServerError
 		}
@@ -248,13 +248,13 @@ func(*ImplementedAuthenticationService) StartRegistration(
 	)
 
 	if error != nil {
-		log.Println("error : ", error.Error( ))
+		log.Println("💀 error marshalling temporary user details : ", error.Error( ))
 		return &protocGenerated.StartRegistrationResponse{Error: &ServerError}, nil
 	}
 
 	error= globalVariables.RedisClient.Set(request.Email, temporaryUserDetails, 600 * time.Second).Err( )
 	if error != nil {
-		log.Println("error : ", error.Error( ))
+		log.Println("💀 error inserting temporary user details in redis : ", error.Error( ))
 		return &protocGenerated.StartRegistrationResponse{Error: &ServerError}, nil
 	}
 
@@ -268,7 +268,7 @@ func(*ImplementedAuthenticationService) StartRegistration(
 		},
 	)
 	if error != nil {
-		log.Println("error : ", error.Error( ))
+		log.Println("💀 error marshalling `send otp` request : ", error.Error( ))
 		return &protocGenerated.StartRegistrationResponse{Error: &ServerError}, nil
 	}
 
@@ -278,7 +278,7 @@ func(*ImplementedAuthenticationService) StartRegistration(
 		amqp.Publishing{ Body: message },
 	)
 	if error != nil {
-		log.Println("error : ", error.Error( ))
+		log.Println("💀 error publishing `send otp` request to rabbitMQ : ", error.Error( ))
 		return &protocGenerated.StartRegistrationResponse{Error: &ServerError}, nil
 	}
 
@@ -292,7 +292,7 @@ func(*ImplementedAuthenticationService) Register(
 
 	record, error := globalVariables.RedisClient.Get(request.Email).Result( )
 	if error != nil {
-		log.Println("error : ", error.Error( ))
+		log.Println("💀 error fetching temporary user details from redis : ", error.Error( ))
 		return &protocGenerated.RegisterResponse{Error: &ServerError}, nil
 	}
 
@@ -300,7 +300,7 @@ func(*ImplementedAuthenticationService) Register(
 
 	error= json.Unmarshal([ ]byte(record), &temporaryUserDetails)
 	if error != nil {
-		log.Println("error : ", error.Error( ))
+		log.Println("💀 error unmarshalling temporary user details record from redis : ", error.Error( ))
 		return &protocGenerated.RegisterResponse{Error: &ServerError}, nil
 	}
 
@@ -313,7 +313,7 @@ func(*ImplementedAuthenticationService) Register(
 		},
 	)
 	if error != nil {
-		log.Println("error : ", error.Error( ))
+		log.Println("💀 error creating new user in database : ", error.Error( ))
 		return &protocGenerated.RegisterResponse{Error: &ServerError}, nil
 	}
 
@@ -333,7 +333,7 @@ func(*ImplementedAuthenticationService) Register(
 		},
 	)
 	if error != nil {
-		log.Println("error : ", error.Error( ))
+		log.Println("💀 error marshalling `create profile` request : ", error.Error( ))
 		return &protocGenerated.RegisterResponse{Error: &ServerError}, nil
 	}
 
@@ -343,14 +343,14 @@ func(*ImplementedAuthenticationService) Register(
 		amqp.Publishing{ Body: message },
 	)
 	if error != nil {
-		log.Println("error : ", error.Error( ))
+		log.Println("💀 error publishing `create profile` request to rabbitMQ : ", error.Error( ))
 		return &protocGenerated.RegisterResponse{Error: &ServerError}, nil
 	}
 
 	//! evicting the record from redis
 	error= globalVariables.RedisClient.Del(temporaryUserDetails.Email).Err( )
 	if error != nil {
-		log.Println("error : ", error.Error( ))
+		log.Println("💀 error evicting temporary user details from redis : ", error.Error( ))
 		return &protocGenerated.RegisterResponse{Error: &ServerError}, nil
 	}
 
@@ -367,6 +367,8 @@ func(*ImplementedAuthenticationService) Signin(
 	if error == sql.ErrNoRows {
 		return &protocGenerated.SigninResponse{Error: &UserNotFoundError}, nil
 	} else if error != nil {
+		log.Println("💀 error searching existing user by email in database : ", error.Error( ))
+
 		return &protocGenerated.SigninResponse{Error: &ServerError}, nil
 	}
 
