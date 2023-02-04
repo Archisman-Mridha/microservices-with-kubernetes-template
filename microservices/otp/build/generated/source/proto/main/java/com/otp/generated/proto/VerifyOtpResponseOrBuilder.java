@@ -3,26 +3,29 @@
 
 package com.otp.generated.proto;
 
-public interface VerifyOtpResponseOrBuilder extends
-    // @@protoc_insertion_point(interface_extends:otp.VerifyOtpResponse)
-    com.google.protobuf.MessageOrBuilder {
+public interface VerifyOtpResponseOrBuilder
+        extends
+        // @@protoc_insertion_point(interface_extends:otp.VerifyOtpResponse)
+        com.google.protobuf.MessageOrBuilder {
 
-  /**
-   * <code>string error = 1;</code>
-   * @return Whether the error field is set.
-   */
-  boolean hasError();
-  /**
-   * <code>string error = 1;</code>
-   * @return The error.
-   */
-  java.lang.String getError();
-  /**
-   * <code>string error = 1;</code>
-   * @return The bytes for error.
-   */
-  com.google.protobuf.ByteString
-      getErrorBytes();
+    /**
+     * <code>string error = 1;</code>
+     *
+     * @return Whether the error field is set.
+     */
+    boolean hasError();
+    /**
+     * <code>string error = 1;</code>
+     *
+     * @return The error.
+     */
+    java.lang.String getError();
+    /**
+     * <code>string error = 1;</code>
+     *
+     * @return The bytes for error.
+     */
+    com.google.protobuf.ByteString getErrorBytes();
 
-  public com.otp.generated.proto.VerifyOtpResponse.OptionalErrorCase getOptionalErrorCase();
+    public com.otp.generated.proto.VerifyOtpResponse.OptionalErrorCase getOptionalErrorCase();
 }
