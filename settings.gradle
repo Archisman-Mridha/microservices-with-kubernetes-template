@@ -10,5 +10,6 @@
 
 rootProject.name = "microservices"
 include(
-    "microservices:otp"
+    "microservices:otp",
+    "microservices:posts"
 )
