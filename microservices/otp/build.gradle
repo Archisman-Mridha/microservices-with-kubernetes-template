@@ -74,8 +74,11 @@ protobuf {
 	}
 
 	generateProtoTasks {
-		all( )*.plugins { // use all gRPC plugins to generate code from proto definitions
-			grpc { }
+		// use all gRPC plugins to generate code from proto definitions
+		all( ).forEach {
+			plugins {
+				grpc { }
+			}
 		}
 	}
 }
