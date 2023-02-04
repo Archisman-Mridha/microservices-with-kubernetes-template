@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS profile.profiles (
+CREATE TABLE profile.profiles (
     id SERIAL PRIMARY KEY,
 
     name VARCHAR(50) NOT NULL,

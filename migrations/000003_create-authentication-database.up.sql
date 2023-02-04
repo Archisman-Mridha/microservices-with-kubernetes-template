@@ -1,1 +1,1 @@
-CREATE DATABASE IF NOT EXISTS authentication;
+CREATE DATABASE authentication;
