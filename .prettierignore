@@ -1,0 +1,11 @@
+# Add files here to ignore them from prettier formatting
+
+/dist
+/coverage
+
+/microservices
+/gradle
+/build
+.gradle
+/migrations
+/scripts
