@@ -9,22 +9,22 @@ A template distributed microservices system backed by Kubernetes and AWS.
     <img src="https://img.icons8.com/color/48/000000/terraform.png" width="50" height="50" />
 </p>
 
-- GoLang - Writing a microservice | Writing end-to-end infrastructure tests using `terratest`
-- Rust and Java - Used to build microservices
-- Typescript - Making the frontend using `nextJS`
-- Python - Writing Kubernetes end-to-end tests using `kubetest`
-- Terraform - Defining local and remote `aws` infrastructure
+- **GoLang** - Writing a microservice | Writing end-to-end infrastructure tests using `terratest`
+- **Rust** and **Java** - Used to build microservices
+- **Typescript** - Making the frontend using `nextJS`
+- **Python** - Writing Kubernetes end-to-end tests using `kubetest`
+- **Terraform** - Defining local and remote `aws` infrastructure
 
 ## Installations
 
-- *`rust`* -
+- `rust` -
     ```bash
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
     set -Ua fish_user_paths $HOME/.cargo/bin
     ```
 
-- *`protoc`* -
+- `protoc` -
     ```bash
     sudo apt install -y protobuf-compiler libprotobuf-dev
 
@@ -36,7 +36,7 @@ A template distributed microservices system backed by Kubernetes and AWS.
     set -U fish_user_paths /usr/local/go/bin $fish_user_paths
     ```
 
-- *`migrate`* -
+- `migrate` -
     ```bash
     curl -s https://packagecloud.io/install/repositories/golang-migrate/migrate/script.deb.sh | sudo bash
     sudo apt-get update
@@ -44,7 +44,7 @@ A template distributed microservices system backed by Kubernetes and AWS.
     sudo apt-get install migrate
     ```
 
-- *`diesel cli`* -
+- `diesel cli` -
     ```bash
     sudo apt install libpq-dev -y
 
@@ -52,7 +52,7 @@ A template distributed microservices system backed by Kubernetes and AWS.
         cargo install diesel_cli_ext
     ```
 
-- *`sqlc`* -
+- `sqlc` -
     ```bash
     # gcc is required to use sqlc
     sudo apt install gcc -y
@@ -60,7 +60,7 @@ A template distributed microservices system backed by Kubernetes and AWS.
     go install github.com/kyleconroy/sqlc/cmd/sqlc@latest
     ```
 
-- *`java`* -
+- `java` -
     ```bash
     wget https://download.oracle.com/java/19/latest/jdk-19_linux-x64_bin.deb
     sudo dpkg -i jdk-19_linux-x64_bin.deb
@@ -83,7 +83,7 @@ A template distributed microservices system backed by Kubernetes and AWS.
     rm gradle-7.6-bin.zip
     ```
 
-- *`javafmt`* -
+- `javafmt` -
     ```bash
     wget https://github.com/google/google-java-format/releases/download/v1.15.0/google-java-format-1.15.0-all-deps.jar
     mv google-java-format-1.15.0-all-deps.jar javafmt.jar
