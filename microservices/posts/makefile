@@ -1,2 +1,2 @@
 serve:
-	cd ../../ & ./gradlew :microservices:posts:run
+	cd ../../ && ./gradlew :microservices:posts:run
