@@ -2,8 +2,18 @@ package otp;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.otp.generated.proto.SendOtpRequest;
@@ -21,15 +31,44 @@ import io.grpc.protobuf.services.ProtoReflectionService;
 import io.grpc.stub.StreamObserver;
 import redis.clients.jedis.Jedis;
 
-class MailingUtils {
+class MailingLayer {
 
-    public static void mail(String address, String content) {
+    private Session session;
 
-        // TODO: implement mailing logic
+    public MailingLayer( ) {
 
+        Properties properties= new Properties( );
+
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.host", "smtp.gmail.com");
+        properties.put("mail.smtp.starttls.enable","true");    
+        properties.put("mail.smtp.ssl.protocols", "TLSv1.2");
+        properties.put("mail.smtp.port", "587");   
+
+        this.session= Session.getInstance(properties,
+
+            new javax.mail.Authenticator( ) {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication( ) {
+                    return new javax.mail.PasswordAuthentication("archismanmridha12345@gmail.com", "zuhgbzhlrqnlavsb");
+                }
+            });
+        this.session.setDebug(true);
     }
 
-    public static void sendOTP(String address, int otp) {
+    public void mail(String address, String content) throws AddressException, MessagingException {
+        MimeMessage message= new MimeMessage(session);
+        message.setFrom(new InternetAddress("archismanmridha12345@gmail.com"));
+
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress(address));
+        message.setSubject("Microservices with Kubernetes Template: OTP Verification");
+
+        message.setText(content);
+
+        Transport.send(message);
+    }
+
+    public void sendOTP(String address, int otp) throws AddressException, MessagingException {
 
         String content=
             String.format(
@@ -40,16 +79,20 @@ class MailingUtils {
                 """, otp
             );
 
-        MailingUtils.mail(address, content);
+        this.mail(address, content);
     }
 }
 
-class RedisUtils {
+class RedisLayer {
 
     private Jedis jedis;
 
-    public void connect( ) {
+    public RedisLayer( ) {
         this.jedis= new Jedis("0.0.0.0");
+    }
+
+    public Jedis getJedisInstance( ) {
+        return this.jedis;
     }
 
     public void disconnect( ) {
@@ -61,14 +104,14 @@ enum Queues {
     otp
 }
 
-class RabbitMQUtils {
+class RabbitMQLayer {
 
     private Connection connection;
     private Channel channel;
 
     private Thread consumerThread;
 
-    public void connect( ) throws IOException, TimeoutException {
+    public RabbitMQLayer( ) throws IOException, TimeoutException {
 
         ConnectionFactory connectionFactory= new ConnectionFactory( );
             connectionFactory.setHost("0.0.0.0");
@@ -80,9 +123,11 @@ class RabbitMQUtils {
         System.out.println("🔥 connected to rabbitMQ");
     }
 
-    public void consume(Jedis jedis) throws IOException {
+    public void consume(Jedis jedis, MailingLayer mailingLayer) throws IOException {
 
         DeliverCallback deliverCallback= (consumerTag, message) -> {
+
+            Boolean acknowledge= true;
 
             try {
                 SendOtpRequest request= SendOtpRequest.parser( ).parseFrom(message.getBody( ));
@@ -92,15 +137,21 @@ class RabbitMQUtils {
 
                 jedis.setex(request.getEmail( ), 5 * 60, String.valueOf(otp));
 
-                MailingUtils.sendOTP(request.getEmail( ), otp);
-
-                this.channel.basicAck(message.getEnvelope( ).getDeliveryTag( ), true);
+                mailingLayer.sendOTP(request.getEmail( ), otp);
 
             } catch(InvalidProtocolBufferException exception) {
                 System.out.println("unknown type of message received from rabbitMQ");
 
-                this.channel.basicAck(message.getEnvelope( ).getDeliveryTag( ), false);
+            } catch (AddressException e) {
+                System.out.println("error parsing recipient email address");
+
+            } catch (MessagingException e) {
+                System.out.println("error sending mail to the recipient");
+
+                acknowledge= false;
             }
+
+            this.channel.basicAck(message.getEnvelope( ).getDeliveryTag( ), acknowledge);
         };
 
         this.consumerThread= new Thread(
@@ -147,34 +198,31 @@ class OTPService extends OtpImplBase {
 
 public class App {
 
-    public static void main(String[ ] args) throws IOException, InterruptedException, TimeoutException {
+    public static void main(String[ ] args) throws IOException, InterruptedException, TimeoutException, AddressException, MessagingException {
 
-        RedisUtils redisUtils= new RedisUtils( );
-        RabbitMQUtils rabbitMQUtils= new RabbitMQUtils( );
+        //* starting SMTP server
+        MailingLayer mailingLayer= new MailingLayer( );
 
-        try {
+        //* connect to redis
+        RedisLayer redisLayer= new RedisLayer( );
 
-            //* connect to redis
-            redisUtils.connect( );
+        //* connecting to rabbitMQ and consuming messages
+        RabbitMQLayer rabbitMQLayer= new RabbitMQLayer( );
+        rabbitMQLayer.consume(redisLayer.getJedisInstance( ), mailingLayer);
 
-            //* connecting to rabbitMQ and consuming messages
-            rabbitMQUtils.connect( );
+        //* starting the gRPC server
+        Server server= NettyServerBuilder.forPort(4000)
+            .addService(new OTPService( ))
+            .addService(ProtoReflectionService.newInstance( )) // for gRPC reflection
+            .build( );
 
-            //* starting the gRPC server
-            Server server= NettyServerBuilder.forPort(4000)
-                .addService(new OTPService( ))
-                .addService(ProtoReflectionService.newInstance( )) // for gRPC reflection
-                .build( );
+        System.out.println("🔥 starting gRPC server");
 
-            System.out.println("🔥 starting gRPC server");
+        server.start( ).
+            awaitTermination( );
 
-            server.start( ).
-                awaitTermination( );
-
-        } finally {
-            rabbitMQUtils.disconnect( );
-            redisUtils.disconnect( );
-        }
+        rabbitMQLayer.disconnect( );
+        redisLayer.disconnect( );
     }
 
 }
