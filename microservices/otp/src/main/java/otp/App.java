@@ -73,7 +73,7 @@ class MailingLayer {
         String content=
             String.format(
                 """
-                    Your verification OTP for `microservices with kubernetes template` app is %d.
+                    Your verification OTP for `Microservices with Kubernetes template` app is %d.
 
                     This OTP will be valid for the next 5 minutes.
                 """, otp
@@ -193,7 +193,9 @@ class OTPService extends OtpImplBase {
 
         // TODO: Auto-generated method stub
         super.verifyOtp(request, responseObserver);
+
     }
+
 }
 
 public class App {
