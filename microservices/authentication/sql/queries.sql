@@ -1,5 +1,5 @@
 -- name: FindRegisteredEmail :one
-SELECT * FROM users
+SELECT (email) FROM users
     WHERE users.email= @email
         LIMIT 1;
 

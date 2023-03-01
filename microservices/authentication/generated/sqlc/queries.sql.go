@@ -26,16 +26,15 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
 }
 
 const findRegisteredEmail = `-- name: FindRegisteredEmail :one
-SELECT id, email, password FROM users
+SELECT (email) FROM users
     WHERE users.email= $1
         LIMIT 1
 `
 
-func (q *Queries) FindRegisteredEmail(ctx context.Context, email string) (User, error) {
+func (q *Queries) FindRegisteredEmail(ctx context.Context, email string) (string, error) {
 	row := q.db.QueryRowContext(ctx, findRegisteredEmail, email)
-	var i User
-	err := row.Scan(&i.ID, &i.Email, &i.Password)
-	return i, err
+	err := row.Scan(&email)
+	return email, err
 }
 
 const getPasswordForEmail = `-- name: GetPasswordForEmail :one

@@ -10,7 +10,7 @@ import (
 
 type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) error
-	FindRegisteredEmail(ctx context.Context, email string) (User, error)
+	FindRegisteredEmail(ctx context.Context, email string) (string, error)
 	GetPasswordForEmail(ctx context.Context, email string) (string, error)
 }
 

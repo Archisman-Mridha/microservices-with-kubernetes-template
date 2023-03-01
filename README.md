@@ -5,12 +5,12 @@ A template distributed microservices system backed by Kubernetes and AWS.
 ## Languages Used
 
 <p>
-    <img src="https://skillicons.dev/icons?i=go,rust,ts,python,java,kotlin" />
+    <img src="https://skillicons.dev/icons?i=go,rust,ts,python,java,cpp" />
     <img src="https://img.icons8.com/color/48/000000/terraform.png" width="50" height="50" />
 </p>
 
 - **GoLang** - Writing a microservice | Writing end-to-end infrastructure tests using `terratest`
-- **Rust**, **Java** and **Kotlin** - Used to build microservices
+- **Rust**, **Java** and **C++** - Used to build microservices
 - **Typescript** - Making the frontend using `nextJS`
 - **Python** - Writing Kubernetes end-to-end tests using `kubetest`
 - **Terraform** - Defining local and remote `aws` infrastructure
@@ -91,6 +91,8 @@ A template distributed microservices system backed by Kubernetes and AWS.
 
 ## Conventions
 
-- In RabbitMQ, if name of a queue is **profile**, that means, the messages in the queue will be consumed by the profile microservice.
+- In RabbitMQ, if the name of a queue is **profile**, that means, the messages in the queue will be consumed by the profile microservice.
 
 - Docker build commands are executed from the root of the project.
+
+- A `message` is used to communicate between 2 microservices.

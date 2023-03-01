@@ -3,6 +3,6 @@ syntax= "proto3";
 package authentication;
 option go_package="generated/proto";
 
-message SetEmailVerifiedRequest {
+message SetTemporaryUserVerifiedRequest {
     string email= 1;
 }

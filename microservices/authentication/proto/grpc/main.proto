@@ -3,9 +3,9 @@ syntax= "proto3";
 package authentication;
 option go_package="generated/proto";
 
-import "start-registration.proto";
-import "register.proto";
-import "signin.proto";
+import "grpc/start-registration.proto";
+import "grpc/register.proto";
+import "grpc/signin.proto";
 
 service Authentication {
 
