@@ -14,11 +14,30 @@ import (
 
 type RabbitMQInboundAdapter struct {
 	ApplicationLayer ports.ApplicationPort
+
+	Channel *amqp.Channel
 }
 
-func(instance *RabbitMQInboundAdapter) StartMessageConsumption(channel *amqp.Channel) {
+func(instance *RabbitMQInboundAdapter) CreateChannel(connection *amqp.Connection) {
+	var error error
 
-	newMessages, error := channel.Consume(utils.AuthenticationQueueName, "", false, false, false, false, nil)
+	instance.Channel, error= connection.Channel( )
+	if error != nil {
+		log.Fatal("💀 error creating rabbitMQ channel : ", error.Error( ))}
+
+	utils.DeclareRabbitMQQueue(instance.Channel, utils.AuthenticationQueueName)
+
+	log.Println("🔥 created rabbitMQ channel for message consumption")
+}
+
+func(instance *RabbitMQInboundAdapter) DestroyChannel( ) {
+	if instance.Channel != nil {
+		instance.Channel.Close( )}
+}
+
+func(instance *RabbitMQInboundAdapter) StartMessageConsumption( ) {
+
+	newMessages, error := instance.Channel.Consume(utils.AuthenticationQueueName, "", false, false, false, false, nil)
 	if error != nil {
 		log.Fatalf("💀 error consuming from queue %s : %s", utils.AuthenticationQueueName, error.Error( ))}
 
