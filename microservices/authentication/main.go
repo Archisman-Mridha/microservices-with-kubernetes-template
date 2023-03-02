@@ -9,10 +9,12 @@ import (
 	businessLogic "authentication/domain/business-logic"
 	"authentication/domain/repository"
 	"authentication/ports"
+	"authentication/utils"
 )
 
-var (
+var rabbitMQMainConnection= utils.CreateRabbitMQMainConnection( )
 
+var (
 	//* inbound adapters
 	grpcAdapter= &inboundAdapters.GrpcAdapter{ }
 	rabbitMQInboundAdapter= inboundAdapters.CreateRabbitMQInboundAdapter(applicationLayer)
@@ -39,24 +41,22 @@ var (
 
 func main( ) {
 
-	// initiate connections for outbound adapters
+	// create channels and declare queues for rabbitMQ based inbound / outbound adapters
+	// initiate connections for other outbound adapters
 
-	outboundAdapters := []outboundAdapters.OutboundAdapter{
+	rabbitMQInboundAdapter.Connect(rabbitMQMainConnection)
+	defer rabbitMQInboundAdapter.Disconnect( )
 
-		cockroachDBAdapter,
-		redisAdapter,
-		rabbitMQOutboundAdapter,
-	}
-
-	for _, outboundAdapter := range outboundAdapters {
+	for _, outboundAdapter := range []outboundAdapters.OutboundAdapter{ cockroachDBAdapter, redisAdapter } {
 		outboundAdapter.Connect( )
-
 		defer outboundAdapter.Disconnect( )
 	}
+	rabbitMQOutboundAdapter.Connect(rabbitMQMainConnection)
+	defer rabbitMQOutboundAdapter.Disconnect( )
 
 	// the presentation layer
 
-	go rabbitMQInboundAdapter.StartMessageConsumption(rabbitMQOutboundAdapter.Channel)
+	go rabbitMQInboundAdapter.StartMessageConsumption( )
 
 	grpcAdapter.StartServer(applicationLayer)
 	defer grpcAdapter.StopServer( )

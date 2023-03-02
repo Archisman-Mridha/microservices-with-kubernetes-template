@@ -13,39 +13,26 @@ import (
 type RabbitMQOutboundAdapter struct {
 	OutboundAdapter
 
-	connection *amqp.Connection
 	Channel *amqp.Channel
 }
 
-func(instance *RabbitMQOutboundAdapter) Connect( ) {
+// by connect, we mean creating a channel and declaring the necessary queues
+func(instance *RabbitMQOutboundAdapter) Connect(connection *amqp.Connection) {
 	var error error
 
-	instance.connection, error= amqp.Dial("amqp://user:password@localhost:5672")
-	if error != nil {
-		log.Fatal("💀 error connecting to rabbitMQ : ", error.Error( ))}
-
-	instance.Channel, error= instance.connection.Channel( )
+	instance.Channel, error= connection.Channel( )
 	if error != nil {
 		log.Fatal("💀 error creating rabbitMQ channel : ", error.Error( ))}
 
-	for _, queueName := range []string{utils.OtpQueueName, utils.ProfileQueueName, utils.AuthenticationQueueName} {
-		_, error := instance.Channel.QueueDeclare(
-			queueName, false, false, false, false, nil)
+	for _, queueName := range []string{utils.OtpQueueName, utils.ProfileQueueName} {
+		utils.DeclareRabbitMQQueue(instance.Channel, queueName)}
 
-		if error != nil {
-			log.Fatalf("💀 error declaring queue %s : %s", queueName, error.Error( ))}
-	}
-
-	log.Println("🔥 connected to rabbitMQ")
+	log.Println("🔥 created rabbitMQ channel for sending messages")
 }
 
 func(instance *RabbitMQOutboundAdapter) Disconnect( ) {
-
 	if instance.Channel != nil {
 		instance.Channel.Close( )}
-
-	if instance.connection != nil {
-		instance.connection.Close( )}
 }
 
 func(instance *RabbitMQOutboundAdapter) SendOTP(email string) {
