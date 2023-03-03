@@ -11,30 +11,58 @@ import (
 
 const createUser = `-- name: CreateUser :exec
 INSERT INTO users
-    (email, password)
-        VALUES ($1, $2)
+    (username, email, password)
+        VALUES ($1, $2, $3)
 `
 
 type CreateUserParams struct {
+	Username string
 	Email    string
 	Password string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) error {
-	_, err := q.db.ExecContext(ctx, createUser, arg.Email, arg.Password)
+	_, err := q.db.ExecContext(ctx, createUser, arg.Username, arg.Email, arg.Password)
 	return err
 }
 
-const findRegisteredEmail = `-- name: FindRegisteredEmail :one
-SELECT (email) FROM users
-    WHERE users.email= $1
-        LIMIT 1
+const findDuplicateUser = `-- name: FindDuplicateUser :many
+SELECT id, email, username, password FROM users
+    WHERE users.email= $1 OR users.username= $2
+        LIMIT 2
 `
 
-func (q *Queries) FindRegisteredEmail(ctx context.Context, email string) (string, error) {
-	row := q.db.QueryRowContext(ctx, findRegisteredEmail, email)
-	err := row.Scan(&email)
-	return email, err
+type FindDuplicateUserParams struct {
+	Email    string
+	Username string
+}
+
+func (q *Queries) FindDuplicateUser(ctx context.Context, arg FindDuplicateUserParams) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, findDuplicateUser, arg.Email, arg.Username)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Email,
+			&i.Username,
+			&i.Password,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getPasswordForEmail = `-- name: GetPasswordForEmail :one

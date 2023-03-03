@@ -50,8 +50,8 @@ func(instance *RabbitMQInboundAdapter) StartMessageConsumption( ) {
 
 		switch unmarshalledMessage.MessageType {
 
-			case utils.SetTemporaryUserVerified_MessageType:
-				var request messages.SetTemporaryUserVerifiedIncomingMessage
+			case utils.RegisterUser_MessageType:
+				var request messages.RegisterUserIncomingMessage
 
 				error := proto.Unmarshal(message.Body, &request)
 				if error != nil {
@@ -61,8 +61,8 @@ func(instance *RabbitMQInboundAdapter) StartMessageConsumption( ) {
 					continue
 				}
 
-				output := instance.ApplicationLayer.SetTemporaryUserVerified(
-					&types.SetTemporaryUserVerifiedParameters{
+				output := instance.ApplicationLayer.Register(
+					&types.RegisterParameters{
 						Email: request.Email,
 					})
 

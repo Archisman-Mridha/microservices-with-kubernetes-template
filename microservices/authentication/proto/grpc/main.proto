@@ -4,13 +4,11 @@ package authentication;
 option go_package="generated/proto";
 
 import "grpc/start-registration.proto";
-import "grpc/register.proto";
 import "grpc/signin.proto";
 
 service Authentication {
 
     rpc StartRegistration(StartRegistrationRequest) returns(StartRegistrationResponse) { }
-    rpc Register(RegisterReqeust) returns(RegisterResponse) { }
 
-    rpc Signin(SigninReqeust) returns(SigninResponse) { }
+    rpc Signin(SigninRequest) returns(SigninResponse) { }
 }

@@ -20,7 +20,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type SigninReqeust struct {
+type SigninRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -29,8 +29,8 @@ type SigninReqeust struct {
 	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
 }
 
-func (x *SigninReqeust) Reset() {
-	*x = SigninReqeust{}
+func (x *SigninRequest) Reset() {
+	*x = SigninRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_grpc_signin_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -38,13 +38,13 @@ func (x *SigninReqeust) Reset() {
 	}
 }
 
-func (x *SigninReqeust) String() string {
+func (x *SigninRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SigninReqeust) ProtoMessage() {}
+func (*SigninRequest) ProtoMessage() {}
 
-func (x *SigninReqeust) ProtoReflect() protoreflect.Message {
+func (x *SigninRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_grpc_signin_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -56,19 +56,19 @@ func (x *SigninReqeust) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SigninReqeust.ProtoReflect.Descriptor instead.
-func (*SigninReqeust) Descriptor() ([]byte, []int) {
+// Deprecated: Use SigninRequest.ProtoReflect.Descriptor instead.
+func (*SigninRequest) Descriptor() ([]byte, []int) {
 	return file_grpc_signin_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *SigninReqeust) GetEmail() string {
+func (x *SigninRequest) GetEmail() string {
 	if x != nil {
 		return x.Email
 	}
 	return ""
 }
 
-func (x *SigninReqeust) GetPassword() string {
+func (x *SigninRequest) GetPassword() string {
 	if x != nil {
 		return x.Password
 	}
@@ -136,7 +136,7 @@ var file_grpc_signin_proto_rawDesc = []byte{
 	0x0a, 0x11, 0x67, 0x72, 0x70, 0x63, 0x2f, 0x73, 0x69, 0x67, 0x6e, 0x69, 0x6e, 0x2e, 0x70, 0x72,
 	0x6f, 0x74, 0x6f, 0x12, 0x0e, 0x61, 0x75, 0x74, 0x68, 0x65, 0x6e, 0x74, 0x69, 0x63, 0x61, 0x74,
 	0x69, 0x6f, 0x6e, 0x22, 0x41, 0x0a, 0x0d, 0x53, 0x69, 0x67, 0x6e, 0x69, 0x6e, 0x52, 0x65, 0x71,
-	0x65, 0x75, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x01, 0x20,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x61,
 	0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61,
 	0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x22, 0x47, 0x0a, 0x0e, 0x53, 0x69, 0x67, 0x6e, 0x69, 0x6e,
@@ -162,7 +162,7 @@ func file_grpc_signin_proto_rawDescGZIP() []byte {
 
 var file_grpc_signin_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_grpc_signin_proto_goTypes = []interface{}{
-	(*SigninReqeust)(nil),  // 0: authentication.SigninReqeust
+	(*SigninRequest)(nil),  // 0: authentication.SigninRequest
 	(*SigninResponse)(nil), // 1: authentication.SigninResponse
 }
 var file_grpc_signin_proto_depIdxs = []int32{
@@ -180,7 +180,7 @@ func file_grpc_signin_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_grpc_signin_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SigninReqeust); i {
+			switch v := v.(*SigninRequest); i {
 			case 0:
 				return &v.state
 			case 1:

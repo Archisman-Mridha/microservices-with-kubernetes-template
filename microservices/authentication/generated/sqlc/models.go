@@ -9,5 +9,6 @@ import ()
 type User struct {
 	ID       int32
 	Email    string
+	Username string
 	Password string
 }

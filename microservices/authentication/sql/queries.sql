@@ -1,12 +1,12 @@
--- name: FindRegisteredEmail :one
-SELECT (email) FROM users
-    WHERE users.email= @email
-        LIMIT 1;
+-- name: FindDuplicateUser :many
+SELECT * FROM users
+    WHERE users.email= @email OR users.username= @username
+        LIMIT 2;
 
 -- name: CreateUser :exec
 INSERT INTO users
-    (email, password)
-        VALUES (@email, @password);
+    (username, email, password)
+        VALUES (@username, @email, @password);
 
 -- name: GetPasswordForEmail :one
 SELECT password FROM users

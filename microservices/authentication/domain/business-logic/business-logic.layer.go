@@ -15,56 +15,52 @@ type BusinessLogicLayer struct {
 
 func(instance *BusinessLogicLayer) StartRegistration(parameters *types.StartRegistrationParameters) *types.StartRegistrationOutput {
 
-	error := instance.RepositoryLayer.UsersRepository.ApplyPreRegisteredEmailFilter(parameters.Email)
-	if error != nil {
-		return &types.StartRegistrationOutput{ Error: &customErrors.ServerError }}
+	errors := instance.RepositoryLayer.UsersRepository.ApplyPreregisteredUserFilter(parameters.Email, parameters.Username)
+	if len(errors) != 0 {
+		return &types.StartRegistrationOutput{ Errors: errors }}
 
-	error= instance.RepositoryLayer.CacheRepository.SaveTemporaryUserDetails(
+	error := instance.RepositoryLayer.CacheRepository.SaveTemporaryUserDetails(
 		&valueObjects.TemporaryUserDetails{
 			Email: parameters.Email,
-			Name: parameters.Name,
-			IsVerified: false,
+			Username: parameters.Username,
+			Password: parameters.Password,
 		},
 	)
 	if error != nil {
-		return &types.StartRegistrationOutput{ Error: error }}
+		errors= append(errors, *error)
+		return &types.StartRegistrationOutput{ Errors: errors }}
 
 	return &types.StartRegistrationOutput{ }
 }
 
-func(instance *BusinessLogicLayer) SetTemporaryUserVerified(parameters *types.SetTemporaryUserVerifiedParameters) *types.SetTemporaryUserVerifiedOutput {
+func(instance *BusinessLogicLayer) Register(parameters *types.RegisterParameters) *types.RegisterBusinessLayerOutput {
+	var (
+		temporaryUserDetails *valueObjects.TemporaryUserDetails
+		error *string
+	)
 
-	if error := instance.RepositoryLayer.CacheRepository.SetTemporaryUserVerified(parameters.Email);
+	if temporaryUserDetails, error= instance.RepositoryLayer.CacheRepository.GetTemporaryUser(parameters.Email);
 		error != nil {
-			return &types.SetTemporaryUserVerifiedOutput{ Error: error }}
+			return &types.RegisterBusinessLayerOutput{ Error: error }}
 
-	return &types.SetTemporaryUserVerifiedOutput{ }
-}
-
-func(instance *BusinessLogicLayer) Register(parameters *types.RegisterParameters) (*string, *types.RegisterOutput) {
-
-	temporaryUserDetails, error := instance.RepositoryLayer.CacheRepository.GetTemporaryUserDetails(parameters.Email)
-	if error != nil {
-		return nil, &types.RegisterOutput{ Error: error }}
-
-	if error= instance.RepositoryLayer.UsersRepository.CreateUser(
+	if error := instance.RepositoryLayer.UsersRepository.CreateUser(
 		entities.UserEntity{
 			Email: parameters.Email,
-			Password: parameters.Password,
+			Username: temporaryUserDetails.Username,
+			Password: temporaryUserDetails.Password,
 		},
 	);
 		error != nil {
-			return nil, &types.RegisterOutput{ Error: error }}
+			return &types.RegisterBusinessLayerOutput{ Error: error }}
 
-	jwt, error := utils.CreateJwt(temporaryUserDetails.Email)
-	if error != nil {
-		return nil, &types.RegisterOutput{ Error: error }}
+	// NOTE: didn't evict the temporary user details
 
-	if error= instance.RepositoryLayer.CacheRepository.DeleteTemporaryUserDetails(parameters.Email);
-		error != nil {
-			return nil, &types.RegisterOutput{ Error: error }}
-
-	return &temporaryUserDetails.Name, &types.RegisterOutput{ Jwt: jwt }
+	return &types.RegisterBusinessLayerOutput{
+			ProfileDetails: &types.ProfileDetails{
+				Username: temporaryUserDetails.Username,
+				Email: temporaryUserDetails.Email,
+			},
+		}
 }
 
 func(instance *BusinessLogicLayer) Signin(parameters *types.SigninParameters) *types.SigninOutput {

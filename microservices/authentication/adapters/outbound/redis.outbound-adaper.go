@@ -12,8 +12,6 @@ import (
 )
 
 type RedisAdapter struct {
-	OutboundAdapter
-
 	Connection *redis.Client
 }
 
@@ -55,7 +53,7 @@ func(instance *RedisAdapter) SaveTemporaryUserDetails(temporaryUserDetails *valu
 	return nil
 }
 
-func(instance *RedisAdapter) GetTemporaryUserDetails(email string) (*valueObjects.TemporaryUserDetails, *string) {
+func(instance *RedisAdapter) GetTemporaryUser(email string) (*valueObjects.TemporaryUserDetails, *string) {
 
 	record, error := instance.Connection.Get(email).Result( )
 	if error != nil {
@@ -72,41 +70,8 @@ func(instance *RedisAdapter) GetTemporaryUserDetails(email string) (*valueObject
 	return &temporaryUserDetails, nil
 }
 
-func(instance *RedisAdapter) DeleteTemporaryUserDetails(email string) *string {
-
+func(instance *RedisAdapter) EvictTemporaryUser(email string) {
 	error := instance.Connection.Del(email).Err( )
 	if error != nil {
-		log.Println("💀 error evicting temporary user details from redis : ", error.Error( ))
-		return &customErrors.ServerError}
-
-	return nil
-}
-
-func(instance *RedisAdapter) SetTemporaryUserVerified(email string) error {
-
-	record, error := instance.Connection.Get(email).Result( )
-	if error != nil {
-		log.Fatalf("💀 error fetching temporary user details from redis : %s", error.Error( ))
-		return error}
-
-	var temporaryUserDetails valueObjects.TemporaryUserDetails
-	error= json.Unmarshal([ ]byte(record), &temporaryUserDetails)
-	if error != nil {
-		log.Fatalf("💀 error unmarshalling temporary user details redis record : %s", error.Error( ))
-		return error}
-
-	temporaryUserDetails.IsVerified= true
-
-	_, error= json.Marshal(&temporaryUserDetails)
-
-	if error != nil {
-		log.Println("💀 error marshalling temporary user details : ", error.Error( ))
-		return error}
-
-	error= instance.Connection.Set(email, temporaryUserDetails, -1).Err( )
-	if error != nil {
-		log.Fatalf("💀 error updating temporary user details record in redis : %s", error.Error( ))
-		return error}
-
-	return nil
+		log.Println("💀 error evicting temporary user details from redis : ", error.Error( ))}
 }

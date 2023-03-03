@@ -7,6 +7,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"authentication/generated/proto/messages"
+	"authentication/types"
 	"authentication/utils"
 )
 
@@ -55,14 +56,14 @@ func(instance *RabbitMQOutboundAdapter) SendOTP(email string) {
 		log.Println("💀 error publishing `send otp` request to rabbitMQ : ", error.Error( ))}
 }
 
-func(instance *RabbitMQOutboundAdapter) CreateProfile(name string, email string) {
+func(instance *RabbitMQOutboundAdapter) CreateProfile(profileDetails *types.ProfileDetails) {
 
 	message, error := proto.Marshal(
 		&messages.CreateProfileOutgoingMessage{
 			MessageType: utils.SendOTP_MessageType,
 
-			Name: name,
-			Email: email,
+			Username: profileDetails.Username,
+			Email: profileDetails.Email,
 		},
 	)
 	if error != nil {

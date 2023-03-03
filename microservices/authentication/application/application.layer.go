@@ -16,12 +16,17 @@ type ApplicationLayer struct {
 
 func(instance *ApplicationLayer) StartRegistration(parameters *types.StartRegistrationParameters) *types.StartRegistrationOutput {
 
+	// -- parameter validations
 	_, error := mail.ParseAddress(parameters.Email)
 	if error!= nil {
-		return &types.StartRegistrationOutput{ Error: &customErrors.EmailValidationError }}
+		return &types.StartRegistrationOutput{ Errors: []string{ customErrors.EmailValidationError }}}
 
-	if len(parameters.Name) < 3 || len(parameters.Name) > 50 {
-		return &types.StartRegistrationOutput{ Error: &customErrors.NameValidationError }}
+	if len(parameters.Username) < 3 || len(parameters.Username) > 50 {
+		return &types.StartRegistrationOutput{ Errors: []string{ customErrors.UsernameValidationError }}}
+
+	if len(parameters.Password) < 3 || len(parameters.Password) > 50 {
+			return &types.StartRegistrationOutput{ Errors: []string{ customErrors.PasswordValidationError }}}
+	// --
 
 	output := instance.BusinessLogicLayer.StartRegistration(parameters)
 
@@ -30,15 +35,13 @@ func(instance *ApplicationLayer) StartRegistration(parameters *types.StartRegist
 	return output
 }
 
-func(instance *ApplicationLayer) SetTemporaryUserVerified(parameters *types.SetTemporaryUserVerifiedParameters) *types.SetTemporaryUserVerifiedOutput {
-	return instance.BusinessLogicLayer.SetTemporaryUserVerified(parameters)}
-
 func(instance *ApplicationLayer) Register(parameters *types.RegisterParameters) *types.RegisterOutput {
-	name, output := instance.BusinessLogicLayer.Register(parameters)
+	output := instance.BusinessLogicLayer.Register(parameters)
 
-	instance.MessagingLayer.CreateProfile(*name, parameters.Email)
+	if output.Error == nil {
+		instance.MessagingLayer.CreateProfile(output.ProfileDetails)}
 
-	return output
+	return &types.RegisterOutput{ Error: output.Error }
 }
 
 func(instance *ApplicationLayer) Signin(parameters *types.SigninParameters) *types.SigninOutput {

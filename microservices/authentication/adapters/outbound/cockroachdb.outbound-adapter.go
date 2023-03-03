@@ -37,15 +37,31 @@ func(instance *CockroachDBAdapter) Disconnect( ) {
 		instance.Connection.Close( )}
 }
 
-func(instance *CockroachDBAdapter) ApplyPreRegisteredEmailFilter(email string) *string {
-	_, error := instance.generatedQueryAppliers.FindRegisteredEmail(context.Background( ), email)
+func(instance *CockroachDBAdapter) ApplyPreregisteredUserFilter(email string, username string) []string {
 
-	if error == sql.ErrNoRows { return nil }
+	queryResult, error := instance.generatedQueryAppliers.FindDuplicateUser(context.Background( ),
+		sqlcGenerated.FindDuplicateUserParams{
+			Email: email,
+			Username: username,
+		})
+
+	if error == sql.ErrNoRows { return []string{ } }
 
 	if error != nil {
-		return &customErrors.ServerError}
+		return []string{ customErrors.ServerError }}
 
-	return &customErrors.EmailPreregisteredError
+	var errors []string
+
+	for _, row := range queryResult {
+
+		if row.Email == email {
+			errors= append(errors, customErrors.EmailPreregisteredError)}
+
+		if row.Username == username {
+			errors= append(errors, customErrors.UsernamePreregisteredError)}
+	}
+
+	return errors
 }
 
 func(instance *CockroachDBAdapter) CreateUser(userEntity entities.UserEntity) *string {

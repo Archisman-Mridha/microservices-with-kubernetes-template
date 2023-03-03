@@ -3,7 +3,7 @@ syntax= "proto3";
 package authentication;
 option go_package="generated/proto";
 
-message SigninReqeust {
+message SigninRequest {
 
     string email= 1;
     string password= 2;

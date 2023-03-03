@@ -5,10 +5,11 @@ option go_package="generated/proto";
 
 message StartRegistrationRequest {
 
-    string name= 1;
-    string email= 2;
+    string email= 1;
+    string username= 2;
+    string password= 3;
 }
 
 message StartRegistrationResponse {
-    optional string error= 1;
+    repeated string errors= 1;
 }

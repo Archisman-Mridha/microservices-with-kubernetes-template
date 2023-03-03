@@ -1,10 +1,12 @@
 package types
 
 type StartRegistrationParameters struct {
-	Name string
+
 	Email string
+	Username string
+	Password string
 }
 
 type StartRegistrationOutput struct {
-	Error *string
+	Errors []string
 }
