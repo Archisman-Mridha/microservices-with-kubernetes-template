@@ -4,6 +4,8 @@ package otp;
 option java_multiple_files= true;
 option java_package= "com.otp.generated.proto";
 
-message SendOtpRequest {
-    string email= 1;
+message SendOTPIncomingMessage {
+    string messageType= 1;
+
+    string email= 2;
 }
