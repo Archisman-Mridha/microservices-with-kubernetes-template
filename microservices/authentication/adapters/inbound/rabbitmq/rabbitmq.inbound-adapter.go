@@ -6,7 +6,7 @@ import (
 	"github.com/streadway/amqp"
 	"google.golang.org/protobuf/proto"
 
-	protocGenerated "authentication/generated/proto/messages"
+	"authentication/generated/proto/messages"
 	"authentication/ports"
 	"authentication/types"
 	"authentication/utils"
@@ -42,7 +42,7 @@ func(instance *RabbitMQInboundAdapter) StartMessageConsumption( ) {
 		log.Fatalf("💀 error consuming from queue %s : %s", utils.AuthenticationQueueName, error.Error( ))}
 
 	for message := range newMessages {
-		var unmarshalledMessage protocGenerated.Message
+		var unmarshalledMessage messages.Message
 
 		error := proto.Unmarshal(message.Body, &unmarshalledMessage)
 		if error != nil {
@@ -51,7 +51,7 @@ func(instance *RabbitMQInboundAdapter) StartMessageConsumption( ) {
 		switch unmarshalledMessage.MessageType {
 
 			case utils.SetTemporaryUserVerified_MessageType:
-				var request protocGenerated.SetTemporaryUserVerifiedRequest
+				var request messages.SetTemporaryUserVerifiedIncomingMessage
 
 				error := proto.Unmarshal(message.Body, &request)
 				if error != nil {

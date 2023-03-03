@@ -1,9 +1,9 @@
 syntax= "proto3";
 
 package authentication;
-option go_package="domain/events";
+option go_package="generated/proto/messages";
 
-message CreateProfileRequest {
+message CreateProfileOutgoingMessage {
     string messageType= 1;
 
     string name= 2;

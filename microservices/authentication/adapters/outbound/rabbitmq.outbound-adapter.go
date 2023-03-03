@@ -6,7 +6,7 @@ import (
 	"github.com/streadway/amqp"
 	"google.golang.org/protobuf/proto"
 
-	"authentication/domain/events"
+	"authentication/generated/proto/messages"
 	"authentication/utils"
 )
 
@@ -37,7 +37,7 @@ func(instance *RabbitMQOutboundAdapter) DestroyChannel( ) {
 func(instance *RabbitMQOutboundAdapter) SendOTP(email string) {
 
 	message, error := proto.Marshal(
-		&events.SendOTPRequest{
+		&messages.SendOTPOutgoingMessage{
 			MessageType: utils.SendOTP_MessageType,
 
 			Email: email,
@@ -58,7 +58,7 @@ func(instance *RabbitMQOutboundAdapter) SendOTP(email string) {
 func(instance *RabbitMQOutboundAdapter) CreateProfile(name string, email string) {
 
 	message, error := proto.Marshal(
-		&events.CreateProfileRequest{
+		&messages.CreateProfileOutgoingMessage{
 			MessageType: utils.SendOTP_MessageType,
 
 			Name: name,

@@ -1,8 +1,0 @@
-syntax= "proto3";
-
-package authentication;
-option go_package="generated/proto";
-
-message SetTemporaryUserVerifiedRequest {
-    string email= 1;
-}
