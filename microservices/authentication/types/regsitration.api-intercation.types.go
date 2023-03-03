@@ -1,11 +1,11 @@
 package types
 
-type RegisterRequest struct {
+type RegisterParameters struct {
 	Email string
 	Password string
 }
 
-type RegisterResponse struct {
+type RegisterOutput struct {
 	Jwt string
 
 	Error *string

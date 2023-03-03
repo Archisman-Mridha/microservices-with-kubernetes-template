@@ -13,73 +13,73 @@ type BusinessLogicLayer struct {
 	RepositoryLayer *repository.RepositoryLayer
 }
 
-func(instance *BusinessLogicLayer) StartRegistration(request *types.StartRegistrationRequest) *types.StartRegistrationResponse {
+func(instance *BusinessLogicLayer) StartRegistration(parameters *types.StartRegistrationParameters) *types.StartRegistrationOutput {
 
-	error := instance.RepositoryLayer.UsersRepository.ApplyPreRegisteredEmailFilter(request.Email)
+	error := instance.RepositoryLayer.UsersRepository.ApplyPreRegisteredEmailFilter(parameters.Email)
 	if error != nil {
-		return &types.StartRegistrationResponse{ Error: &customErrors.ServerError }}
+		return &types.StartRegistrationOutput{ Error: &customErrors.ServerError }}
 
 	error= instance.RepositoryLayer.CacheRepository.SaveTemporaryUserDetails(
 		&valueObjects.TemporaryUserDetails{
-			Email: request.Email,
-			Name: request.Name,
+			Email: parameters.Email,
+			Name: parameters.Name,
 			IsVerified: false,
 		},
 	)
 	if error != nil {
-		return &types.StartRegistrationResponse{ Error: error }}
+		return &types.StartRegistrationOutput{ Error: error }}
 
-	return &types.StartRegistrationResponse{ }
+	return &types.StartRegistrationOutput{ }
 }
 
-func(instance *BusinessLogicLayer) SetTemporaryUserVerified(request *types.SetTemporaryUserVerifiedRequest) *types.SetTemporaryUserVerifiedResponse {
+func(instance *BusinessLogicLayer) SetTemporaryUserVerified(parameters *types.SetTemporaryUserVerifiedParameters) *types.SetTemporaryUserVerifiedOutput {
 
-	if error := instance.RepositoryLayer.CacheRepository.SetTemporaryUserVerified(request.Email);
+	if error := instance.RepositoryLayer.CacheRepository.SetTemporaryUserVerified(parameters.Email);
 		error != nil {
-			return &types.SetTemporaryUserVerifiedResponse{ Error: error }}
+			return &types.SetTemporaryUserVerifiedOutput{ Error: error }}
 
-	return &types.SetTemporaryUserVerifiedResponse{ }
+	return &types.SetTemporaryUserVerifiedOutput{ }
 }
 
-func(instance *BusinessLogicLayer) Register(request *types.RegisterRequest) (*string, *types.RegisterResponse) {
+func(instance *BusinessLogicLayer) Register(parameters *types.RegisterParameters) (*string, *types.RegisterOutput) {
 
-	temporaryUserDetails, error := instance.RepositoryLayer.CacheRepository.GetTemporaryUserDetails(request.Email)
+	temporaryUserDetails, error := instance.RepositoryLayer.CacheRepository.GetTemporaryUserDetails(parameters.Email)
 	if error != nil {
-		return nil, &types.RegisterResponse{ Error: error }}
+		return nil, &types.RegisterOutput{ Error: error }}
 
 	if error= instance.RepositoryLayer.UsersRepository.CreateUser(
 		entities.UserEntity{
-			Email: request.Email,
-			Password: request.Password,
+			Email: parameters.Email,
+			Password: parameters.Password,
 		},
 	);
 		error != nil {
-			return nil, &types.RegisterResponse{ Error: error }}
+			return nil, &types.RegisterOutput{ Error: error }}
 
 	jwt, error := utils.CreateJwt(temporaryUserDetails.Email)
 	if error != nil {
-		return nil, &types.RegisterResponse{ Error: error }}
+		return nil, &types.RegisterOutput{ Error: error }}
 
-	if error= instance.RepositoryLayer.CacheRepository.DeleteTemporaryUserDetails(request.Email);
+	if error= instance.RepositoryLayer.CacheRepository.DeleteTemporaryUserDetails(parameters.Email);
 		error != nil {
-			return nil, &types.RegisterResponse{ Error: error }}
+			return nil, &types.RegisterOutput{ Error: error }}
 
-	return &temporaryUserDetails.Name, &types.RegisterResponse{ Jwt: jwt }
+	return &temporaryUserDetails.Name, &types.RegisterOutput{ Jwt: jwt }
 }
 
-func(instance *BusinessLogicLayer) Signin(request *types.SigninRequest) *types.SigninResponse {
+func(instance *BusinessLogicLayer) Signin(parameters *types.SigninParameters) *types.SigninOutput {
 
-	password, error := instance.RepositoryLayer.UsersRepository.GetPasswordForEmail(request.Email)
+	password, error := instance.RepositoryLayer.UsersRepository.GetPasswordForEmail(parameters.Email)
 	
 	if error != nil {
-		return &types.SigninResponse{ Error: error }}
+		return &types.SigninOutput{ Error: error }}
 
-	if *password != request.Password {
-		return &types.SigninResponse{ Error: &customErrors.WrongPasswordError }}
+	if *password != parameters.Password {
+		return &types.SigninOutput{ Error: &customErrors.WrongPasswordError }}
 
-	jwt, error := utils.CreateJwt(request.Email)
+	jwt, error := utils.CreateJwt(parameters.Email)
 	if error != nil {
-		return &types.SigninResponse{ Error: error }}
+		return &types.SigninOutput{ Error: error }}
 
-	return &types.SigninResponse{ Jwt: jwt }
+	return &types.SigninOutput{ Jwt: jwt }
 }

@@ -1,9 +1,9 @@
 package types
 
-type SetTemporaryUserVerifiedRequest struct {
+type SetTemporaryUserVerifiedParameters struct {
 	Email string
 }
 
-type SetTemporaryUserVerifiedResponse struct {
+type SetTemporaryUserVerifiedOutput struct {
 	Error error
 }

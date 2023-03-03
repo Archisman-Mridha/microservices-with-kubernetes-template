@@ -17,38 +17,38 @@ type ImplementedAuthenticationGrpcService struct {
 func(grpcService *ImplementedAuthenticationGrpcService) StartRegistration(
 	ctx context.Context, request *protocGenerated.StartRegistrationRequest) (*protocGenerated.StartRegistrationResponse, error) {
 
-	response := grpcService.ApplicationLayer.
+	output := grpcService.ApplicationLayer.
 		StartRegistration(
-			&types.StartRegistrationRequest{
+			&types.StartRegistrationParameters{
 				Name: request.Name,
 				Email: request.Email,
 			})
 
-	return &protocGenerated.StartRegistrationResponse{ Error: response.Error }, nil
+	return &protocGenerated.StartRegistrationResponse{ Error: output.Error }, nil
 }
 
 func(grpcService *ImplementedAuthenticationGrpcService) Register(
 	ctx context.Context, request *protocGenerated.RegisterReqeust) (*protocGenerated.RegisterResponse, error) {
 
-	response := grpcService.ApplicationLayer.
+	output := grpcService.ApplicationLayer.
 		Register(
-			&types.RegisterRequest{
+			&types.RegisterParameters{
 				Email: request.Email,
 				Password: request.Password,
 			})
 
-	return &protocGenerated.RegisterResponse{ Jwt: response.Jwt, Error: response.Error }, nil
+	return &protocGenerated.RegisterResponse{ Jwt: output.Jwt, Error: output.Error }, nil
 }
 
 func(grpcService *ImplementedAuthenticationGrpcService) Signin(
 	ctx context.Context, request *protocGenerated.SigninReqeust) (*protocGenerated.SigninResponse, error) {
 
-	response := grpcService.ApplicationLayer.
+	output := grpcService.ApplicationLayer.
 		Signin(
-			&types.SigninRequest{
+			&types.SigninParameters{
 				Email: request.Email,
 				Password: request.Password,
 			})
 
-	return &protocGenerated.SigninResponse{ Jwt: response.Jwt, Error: response.Error }, nil
+	return &protocGenerated.SigninResponse{ Jwt: output.Jwt, Error: output.Error }, nil
 }

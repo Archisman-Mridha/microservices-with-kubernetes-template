@@ -14,32 +14,32 @@ type ApplicationLayer struct {
 	MessagingLayer ports.MessagingPort
 }
 
-func(instance *ApplicationLayer) StartRegistration(request *types.StartRegistrationRequest) *types.StartRegistrationResponse {
+func(instance *ApplicationLayer) StartRegistration(parameters *types.StartRegistrationParameters) *types.StartRegistrationOutput {
 
-	_, error := mail.ParseAddress(request.Email)
+	_, error := mail.ParseAddress(parameters.Email)
 	if error!= nil {
-		return &types.StartRegistrationResponse{ Error: &customErrors.EmailValidationError }}
+		return &types.StartRegistrationOutput{ Error: &customErrors.EmailValidationError }}
 
-	if len(request.Name) < 3 || len(request.Name) > 50 {
-		return &types.StartRegistrationResponse{ Error: &customErrors.NameValidationError }}
+	if len(parameters.Name) < 3 || len(parameters.Name) > 50 {
+		return &types.StartRegistrationOutput{ Error: &customErrors.NameValidationError }}
 
-	response := instance.BusinessLogicLayer.StartRegistration(request)
+	output := instance.BusinessLogicLayer.StartRegistration(parameters)
 
-	instance.MessagingLayer.SendOTP(request.Email)
+	instance.MessagingLayer.SendOTP(parameters.Email)
 
-	return response
+	return output
 }
 
-func(instance *ApplicationLayer) SetTemporaryUserVerified(request *types.SetTemporaryUserVerifiedRequest) *types.SetTemporaryUserVerifiedResponse {
-	return instance.BusinessLogicLayer.SetTemporaryUserVerified(request)}
+func(instance *ApplicationLayer) SetTemporaryUserVerified(parameters *types.SetTemporaryUserVerifiedParameters) *types.SetTemporaryUserVerifiedOutput {
+	return instance.BusinessLogicLayer.SetTemporaryUserVerified(parameters)}
 
-func(instance *ApplicationLayer) Register(request *types.RegisterRequest) *types.RegisterResponse {
-	name, response := instance.BusinessLogicLayer.Register(request)
+func(instance *ApplicationLayer) Register(parameters *types.RegisterParameters) *types.RegisterOutput {
+	name, output := instance.BusinessLogicLayer.Register(parameters)
 
-	instance.MessagingLayer.CreateProfile(*name, request.Email)
+	instance.MessagingLayer.CreateProfile(*name, parameters.Email)
 
-	return response
+	return output
 }
 
-func(instance *ApplicationLayer) Signin(request *types.SigninRequest) *types.SigninResponse {
-	return instance.BusinessLogicLayer.Signin(request)}
+func(instance *ApplicationLayer) Signin(parameters *types.SigninParameters) *types.SigninOutput {
+	return instance.BusinessLogicLayer.Signin(parameters)}

@@ -1,10 +1,10 @@
 package types
 
-type StartRegistrationRequest struct {
+type StartRegistrationParameters struct {
 	Name string
 	Email string
 }
 
-type StartRegistrationResponse struct {
+type StartRegistrationOutput struct {
 	Error *string
 }

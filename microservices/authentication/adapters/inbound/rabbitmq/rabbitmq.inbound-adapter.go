@@ -61,12 +61,12 @@ func(instance *RabbitMQInboundAdapter) StartMessageConsumption( ) {
 					continue
 				}
 
-				result := instance.ApplicationLayer.SetTemporaryUserVerified(
-					&types.SetTemporaryUserVerifiedRequest{
+				output := instance.ApplicationLayer.SetTemporaryUserVerified(
+					&types.SetTemporaryUserVerifiedParameters{
 						Email: request.Email,
 					})
 
-				if result.Error != nil {
+				if output.Error != nil {
 					message.Ack(false); continue}
 
 				message.Ack(true)

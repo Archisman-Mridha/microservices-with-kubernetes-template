@@ -1,11 +1,11 @@
 package types
 
-type SigninRequest struct {
+type SigninParameters struct {
 	Email string
 	Password string
 }
 
-type SigninResponse struct {
+type SigninOutput struct {
 	Jwt string
 
 	Error *string
