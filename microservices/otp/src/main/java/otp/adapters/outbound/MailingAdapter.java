@@ -1,4 +1,4 @@
-package otp.adapters.outbound.mailing;
+package otp.adapters.outbound;
 
 import java.util.Properties;
 
@@ -10,7 +10,9 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-public class MailingAdapter {
+import otp.ports.outbound.MailingPort;
+
+public class MailingAdapter implements MailingPort {
     private Session session;
 
     public MailingAdapter( ) {

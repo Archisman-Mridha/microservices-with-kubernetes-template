@@ -45,7 +45,7 @@ func(instance *RedisAdapter) SaveTemporaryUserDetails(temporaryUserDetails *valu
 		log.Println("💀 error marshalling temporary user details : ", error.Error( ))
 		return &customErrors.ServerError}
 
-	error= instance.Connection.Set(temporaryUserDetails.Email, record, 600 * time.Second).Err( )
+	error= instance.Connection.Set(temporaryUserDetails.Email, record, 11 * time.Minute).Err( )
 	if error != nil {
 		log.Println("💀 error inserting temporary user details in redis : ", error.Error( ))
 		return &customErrors.ServerError}

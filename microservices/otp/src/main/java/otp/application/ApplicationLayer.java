@@ -2,17 +2,20 @@ package otp.application;
 
 import otp.domain.BusinessLogic.BusinessLogicLayer;
 import otp.ports.inbound.APIPort;
+import otp.ports.outbound.CacheRepositoryPort;
+import otp.ports.outbound.MessagingPort;
 import otp.types.SendOTPOutput;
 import otp.types.SendOTPParameters;
 import otp.types.VerifyOTPOutput;
 import otp.types.VerifyOTPParameters;
 
-public class ApplicationLayer implements APIPort {
-    BusinessLogicLayer businessLogicLayer;
+public record ApplicationLayer(
 
-    public ApplicationLayer(BusinessLogicLayer businessLogicLayer) {
-        this.businessLogicLayer= businessLogicLayer;
-    }
+    BusinessLogicLayer businessLogicLayer,
+    MessagingPort messagingLayer,
+    CacheRepositoryPort cacheRepository
+
+) implements APIPort {
 
     @Override
     public SendOTPOutput sendOTP(SendOTPParameters request) {
@@ -22,7 +25,15 @@ public class ApplicationLayer implements APIPort {
     public VerifyOTPOutput verifyOTP(VerifyOTPParameters request) {
         var result= this.businessLogicLayer.verifyOTP(request);
 
-        // TODO: request authentication service to set the temporary user verified in its cache
+        if(result.error( ) == null) {
+            // TODO: communicate to authentication microservice in synchronous manner
+            var isMessageSendingSuccessfull= this.messagingLayer.registerUser(request.email( ));
+
+            if(!isMessageSendingSuccessfull)
+                return new VerifyOTPOutput("server error occured");
+
+            this.cacheRepository.expireOTP(request.email( ));
+        }
 
         return result;
     }
