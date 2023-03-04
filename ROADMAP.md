@@ -2,7 +2,6 @@
 
 - [x] write the microservices at basic level
 - [] shift to `Hexagonal Architecture` and `Domain Driven Design (DDD)`
-- [] shift to `event sourcing` and `CQRS`
 - [] `distributed transactions` using the `Saga` pattern (use `orchestration based` sagas)
 - [] write `unit` and `integration` tests for each microservice
 - [] deploy the complete system to `local Kubernetes` cluster
